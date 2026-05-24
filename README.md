@@ -222,7 +222,7 @@ Complete booking management with filtering, sorting, and status updates.
 Interactive Swagger/OpenAPI documentation for all backend endpoints.
 
 ![Swagger API Documentation](./images/Swagger%20images/Screenshot%202026-05-24%20225418.png)
-
+![Swagger API Documentation](./images/Swagger%20images/Screenshot%202026-05-24%20225429.png)
 **Available Endpoints:**
 - **Auth**: User registration and login
 - **Bookings**: Create, read, update, delete bookings
