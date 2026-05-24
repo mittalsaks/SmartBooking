@@ -31,12 +31,36 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
-      const response = await axiosClient.post('/Auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
-      navigate('/admin');
+      // ✅ validateStatus: accept both 200 and 401 — don't throw on 401
+      // because the .NET backend returns 401 even when login is successful
+      const response = await axiosClient.post(
+        '/Auth/login',
+        { email, password },
+        { validateStatus: (status) => status < 500 }
+      );
+
+      const isSuccess =
+        response.status === 200 ||
+        response.data?.message === 'Login successful.' ||
+        response.data?.token;
+
+      if (isSuccess && response.data?.token) {
+        // ✅ Store token and go to admin
+        localStorage.setItem('token', response.data.token);
+        navigate('/admin');
+      } else if (isSuccess && !response.data?.token) {
+        // Backend says success but no token returned — backend bug
+        setError('Login succeeded but no token received. Please contact support.');
+      } else {
+        // Genuine auth failure
+        setError(
+          response.data?.message || 'Invalid email or password. Please try again.'
+        );
+      }
     } catch {
-      setError('Invalid email or password. Please try again.');
+      setError('Unable to connect to the server. Please try again.');
     } finally {
       setLoading(false);
     }

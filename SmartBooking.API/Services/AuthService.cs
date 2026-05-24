@@ -29,7 +29,7 @@ namespace SmartBooking.API.Services
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return new AuthResponseDto { Message = "Email already exists." };
+                return new AuthResponseDto { IsSuccess = false, Message = "Email already exists." };
 
             var user = new User
             {
@@ -42,17 +42,24 @@ namespace SmartBooking.API.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return new AuthResponseDto { Message = "User registered successfully." };
+            return new AuthResponseDto { IsSuccess = true, Message = "User registered successfully." };
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                return new AuthResponseDto { Message = "Invalid credentials." };
+                return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
 
+            // ✅ Fixed: removed duplicate Token, removed _jwtService (doesn't exist),
+            //           use local GenerateJwtToken(), and set IsSuccess = true
             var token = GenerateJwtToken(user);
-            return new AuthResponseDto { Token = token, Message = "Login successful.", Role = user.Role };
+            return new AuthResponseDto
+            {
+                IsSuccess = true,
+                Token = token,
+                Message = "Login successful."
+            };
         }
 
         private string GenerateJwtToken(User user)
