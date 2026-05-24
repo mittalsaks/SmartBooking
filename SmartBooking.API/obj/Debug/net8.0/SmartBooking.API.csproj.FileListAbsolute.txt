@@ -113,3 +113,4 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\Smart
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.genruntimeconfig.cache
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\ref\SmartBooking.API.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.staticwebassets.runtime.json
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.sourcelink.json

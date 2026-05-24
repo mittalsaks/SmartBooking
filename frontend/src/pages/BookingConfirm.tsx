@@ -8,7 +8,7 @@ import {
   AlertCircle, Hash, Loader2, ChevronRight,
 } from 'lucide-react';
 
-/* ─────────────────── Design Tokens (matches OfferDetail) ─────────────────── */
+/* ─────────────────── Design Tokens ─────────────────── */
 const T = {
   bg:          '#070D1A',
   card:        'rgba(10,20,36,0.82)',
@@ -69,19 +69,19 @@ interface BookingResult {
 }
 
 interface FormState {
-  customerName: string;
+  customerName:  string;
   customerPhone: string;
   customerEmail: string;
-  peopleCount: number;
-  specialNote: string;
+  peopleCount:   number;
+  specialNote:   string;
 }
 
 interface FormErrors {
-  customerName?: string;
+  customerName?:  string;
   customerPhone?: string;
   customerEmail?: string;
-  peopleCount?: string;
-  general?: string;
+  peopleCount?:   string;
+  general?:       string;
 }
 
 /* ─────────────────── Helpers ─────────────────── */
@@ -90,47 +90,18 @@ function formatTime(t?: string): string {
   const parts = t.split(':');
   if (parts.length < 2) return t;
   const h = parseInt(parts[0]);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  return `${h % 12 === 0 ? 12 : h % 12}:${parts[1]} ${ampm}`;
+  return `${h % 12 === 0 ? 12 : h % 12}:${parts[1]} ${h >= 12 ? 'PM' : 'AM'}`;
 }
 
 function formatDate(d: string): string {
-  const date = new Date(d);
-  if (isNaN(date.getTime())) return d;
-  return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  try {
+    return new Date(d).toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
+  } catch { return d; }
 }
 
-/* ─────────────────── Input Field ─────────────────── */
-function Field({
-  label, icon: Icon, required, error, children,
-}: {
-  label: string;
-  icon: React.ElementType;
-  required?: boolean;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700,
-        textTransform: 'uppercase', letterSpacing: '0.08em', color: T.textMuted }}>
-        <Icon size={11} />
-        {label}
-        {required && <span style={{ color: T.red }}>*</span>}
-      </label>
-      {children}
-      <AnimatePresence>
-        {error && (
-          <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            style={{ fontSize: 11, color: T.red, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <AlertCircle size={10} /> {error}
-          </motion.p>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
+/* ─────────────────── Input style ─────────────────── */
 const inputStyle = (focused: boolean, hasError: boolean): React.CSSProperties => ({
   width: '100%',
   padding: '11px 14px',
@@ -143,33 +114,64 @@ const inputStyle = (focused: boolean, hasError: boolean): React.CSSProperties =>
   outline: 'none',
   fontFamily: 'inherit',
   transition: 'border-color 0.2s',
-  boxSizing: 'border-box',
+  boxSizing: 'border-box' as const,
 });
 
-/* ─────────────────── Confirmation Card ─────────────────── */
+/* ─────────────────── Field wrapper ─────────────────── */
+function Field({
+  label, icon: Icon, required, error, children,
+}: {
+  label: string; icon: React.ElementType;
+  required?: boolean; error?: string; children: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <label style={{
+        display: 'flex', alignItems: 'center', gap: 5,
+        fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const,
+        letterSpacing: '0.08em', color: T.textMuted,
+      }}>
+        <Icon size={11} />
+        {label}
+        {required && <span style={{ color: T.red }}>*</span>}
+      </label>
+      {children}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            style={{ fontSize: 11, color: T.red, display: 'flex', alignItems: 'center', gap: 4, margin: 0 }}>
+            <AlertCircle size={10} /> {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─────────────────── Confirmation Page ─────────────────── */
 function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack: () => void }) {
-  const ref = booking.bookingReference || booking.referenceNumber || String(booking.id);
+  const ref = booking.bookingReference || booking.referenceNumber || `#${booking.id}`;
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.96, y: 24 }}
+      initial={{ opacity: 0, scale: 0.95, y: 24 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 260, damping: 24 }}
       style={{ maxWidth: 560, margin: '0 auto' }}
     >
       <div style={{ ...cardStyle }}>
-        {/* Green accent bar */}
+        {/* Top accent */}
         <div style={{ height: 3, background: `linear-gradient(90deg, ${T.green}, ${T.cyan})` }} />
 
-        {/* Success hero */}
+        {/* Hero */}
         <div style={{
-          padding: '40px 32px 28px',
-          textAlign: 'center',
+          padding: '40px 32px 28px', textAlign: 'center',
           borderBottom: `1px solid ${T.border}`,
           background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(57,255,150,0.06) 0%, transparent 70%)',
         }}>
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 0 }} animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.15 }}
             style={{
               width: 72, height: 72, borderRadius: '50%', margin: '0 auto 20px',
@@ -192,17 +194,19 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
             Your reservation has been successfully placed.
           </p>
 
-          {/* Reference Number */}
+          {/* Reference number */}
           <div style={{
-            marginTop: 20, padding: '14px 20px', borderRadius: 14, display: 'inline-flex',
-            alignItems: 'center', gap: 10,
+            marginTop: 20, padding: '14px 20px', borderRadius: 14,
+            display: 'inline-flex', alignItems: 'center', gap: 10,
             background: T.greenDim, border: `1px solid ${T.greenBorder}`,
           }}>
             <Hash size={16} color={T.green} />
             <div style={{ textAlign: 'left' }}>
-              <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: 'rgba(57,255,150,0.6)', margin: '0 0 2px' }}>Booking Reference</p>
-              <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: T.green, margin: 0 }}>
+              <p style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
+                textTransform: 'uppercase', color: 'rgba(57,255,150,0.6)', margin: '0 0 2px',
+              }}>Booking Reference</p>
+              <p style={{ fontSize: 20, fontWeight: 800, fontFamily: 'monospace', color: T.green, margin: 0 }}>
                 {ref}
               </p>
             </div>
@@ -212,13 +216,16 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
         {/* Detail rows */}
         <div style={{ padding: '24px 32px' }}>
           {[
-            { icon: FileText,   label: 'Offer',          value: booking.offerTitle },
-            { icon: Building2,  label: 'Business',       value: booking.businessName },
-            { icon: Calendar,   label: 'Date',           value: formatDate(booking.slotDate) },
-            { icon: Clock,      label: 'Time',           value: `${formatTime(booking.slotStartTime)} – ${formatTime(booking.slotEndTime)}` },
-            { icon: User,       label: 'Customer',       value: booking.customerName },
-            { icon: Users,      label: 'People',         value: String(booking.peopleCount) },
-            { icon: CheckCircle,label: 'Status',         value: booking.status, highlight: true },
+            { icon: FileText,    label: 'Offer',    value: booking.offerTitle },
+            { icon: Building2,   label: 'Business', value: booking.businessName },
+            { icon: Calendar,    label: 'Date',     value: formatDate(booking.slotDate) },
+            {
+              icon: Clock, label: 'Time',
+              value: `${formatTime(booking.slotStartTime)} – ${formatTime(booking.slotEndTime)}`,
+            },
+            { icon: User,        label: 'Customer', value: booking.customerName },
+            { icon: Users,       label: 'People',   value: String(booking.peopleCount) },
+            { icon: CheckCircle, label: 'Status',   value: booking.status, highlight: true },
           ].map(({ icon: Icon, label, value, highlight }) => (
             <div key={label} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -232,13 +239,12 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
                 <span style={{
                   padding: '3px 10px', borderRadius: 99, fontSize: 10, fontWeight: 800,
                   background: T.greenDim, border: `1px solid ${T.greenBorder}`, color: T.green,
-                }}>
-                  {value}
-                </span>
+                }}>{value}</span>
               ) : (
-                <span style={{ fontSize: 13, color: T.text, fontWeight: 600, textAlign: 'right', maxWidth: '55%' }}>
-                  {value}
-                </span>
+                <span style={{
+                  fontSize: 13, color: T.text, fontWeight: 600,
+                  textAlign: 'right', maxWidth: '58%',
+                }}>{value}</span>
               )}
             </div>
           ))}
@@ -247,11 +253,11 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
         {/* Footer */}
         <div style={{ padding: '0 32px 28px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{
-            padding: '12px 16px', borderRadius: 12,
+            padding: '12px 16px', borderRadius: 12, textAlign: 'center',
             background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.18)',
-            fontSize: 11, color: T.cyan, lineHeight: 1.6, textAlign: 'center',
+            fontSize: 11, color: T.cyan, lineHeight: 1.6,
           }}>
-            📩 Please save your booking reference number. Show it at the venue to redeem your offer.
+            📩 Save your booking reference. Show it at the venue to redeem your offer.
           </div>
           <motion.button
             whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}
@@ -280,12 +286,12 @@ export default function BookingConfirm() {
   const { slotId } = useParams<{ slotId: string }>();
   const navigate   = useNavigate();
 
-  const [slot,        setSlot]        = useState<SlotInfo | null>(null);
-  const [loading,     setLoading]     = useState(true);
-  const [submitting,  setSubmitting]  = useState(false);
-  const [confirmed,   setConfirmed]   = useState<BookingResult | null>(null);
-  const [errors,      setErrors]      = useState<FormErrors>({});
-  const [focused,     setFocused]     = useState<string | null>(null);
+  const [slot,       setSlot]       = useState<SlotInfo | null>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmed,  setConfirmed]  = useState<BookingResult | null>(null);
+  const [errors,     setErrors]     = useState<FormErrors>({});
+  const [focused,    setFocused]    = useState<string | null>(null);
 
   const [form, setForm] = useState<FormState>({
     customerName:  '',
@@ -295,34 +301,34 @@ export default function BookingConfirm() {
     specialNote:   '',
   });
 
-  /* ── Load slot info ── */
+  /* ── Load slot + offer info ── */
   useEffect(() => {
     if (!slotId) return;
-    const load = async () => {
+    (async () => {
       try {
-        // Fetch slot details
+        /* Step 1: fetch the slot directly */
         const slotRes = await axiosClient.get(`/slots/${slotId}`);
         const s = slotRes.data;
 
-        // Also fetch the offer for full pricing info
+        /* Step 2: fetch the parent offer for pricing + business info */
         let offerData: any = {};
         try {
           const offerRes = await axiosClient.get(`/offers/${s.offerId}`);
           offerData = offerRes.data;
-        } catch { /* offer data optional */ }
+        } catch { /* offer info is enrichment only — fail gracefully */ }
 
         setSlot({
-          id:                   s.id,
-          offerId:              s.offerId,
-          offerTitle:           offerData.title        ?? s.offerTitle        ?? 'Offer',
-          businessName:         offerData.businessName ?? s.businessName      ?? '',
-          slotDate:             s.slotDate,
-          startTime:            s.startTime,
-          endTime:              s.endTime,
-          availableCount:       s.availableCount,
-          capacity:             s.capacity,
-          offerPrice:           offerData.offerPrice   ?? s.offerPrice        ?? 0,
-          originalPrice:        offerData.originalPrice ?? s.originalPrice    ?? 0,
+          id:                    s.id,
+          offerId:               s.offerId,
+          offerTitle:            offerData.title             ?? s.offerTitle        ?? 'Offer',
+          businessName:          offerData.businessName      ?? s.businessName      ?? '',
+          slotDate:              s.slotDate,
+          startTime:             s.startTime,
+          endTime:               s.endTime,
+          availableCount:        s.availableCount            ?? s.available         ?? 0,
+          capacity:              s.capacity,
+          offerPrice:            offerData.offerPrice        ?? s.offerPrice        ?? 0,
+          originalPrice:         offerData.originalPrice     ?? s.originalPrice     ?? 0,
           maxBookingPerCustomer: offerData.maxBookingPerCustomer ?? 5,
         });
       } catch {
@@ -330,18 +336,17 @@ export default function BookingConfirm() {
       } finally {
         setLoading(false);
       }
-    };
-    load();
+    })();
   }, [slotId]);
 
-  /* ── Client-side validation ── */
+  /* ── Validation ── */
   const validate = (): FormErrors => {
     const e: FormErrors = {};
     if (!form.customerName.trim())
-      e.customerName = 'Name is required.';
+      e.customerName = 'Full name is required.';
     if (!form.customerPhone.trim())
       e.customerPhone = 'Phone number is required.';
-    else if (!/^\+?[\d\s\-()]{7,20}$/.test(form.customerPhone.trim()))
+    else if (!/^\+?[\d\s\-()\u0966-\u096F]{7,20}$/.test(form.customerPhone.trim()))
       e.customerPhone = 'Enter a valid phone number.';
     if (form.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerEmail))
       e.customerEmail = 'Enter a valid email address.';
@@ -350,7 +355,7 @@ export default function BookingConfirm() {
     if (slot && form.peopleCount > slot.availableCount)
       e.peopleCount = `Only ${slot.availableCount} seat(s) available.`;
     if (slot && form.peopleCount > slot.maxBookingPerCustomer)
-      e.peopleCount = `Maximum ${slot.maxBookingPerCustomer} people per booking.`;
+      e.peopleCount = `Max ${slot.maxBookingPerCustomer} people per booking.`;
     return e;
   };
 
@@ -361,71 +366,82 @@ export default function BookingConfirm() {
     setErrors({});
     setSubmitting(true);
     try {
-      const payload = {
+      const payload: Record<string, any> = {
         slotId:        Number(slotId),
         offerId:       slot?.offerId ?? 0,
         customerName:  form.customerName.trim(),
         customerPhone: form.customerPhone.trim(),
-        customerEmail: form.customerEmail.trim() || undefined,
         peopleCount:   form.peopleCount,
-        specialNote:   form.specialNote.trim() || undefined,
       };
+      if (form.customerEmail.trim()) payload.customerEmail = form.customerEmail.trim();
+      if (form.specialNote.trim())   payload.specialNote   = form.specialNote.trim();
+
       const res = await axiosClient.post('/bookings', payload);
       setConfirmed(res.data);
     } catch (err: any) {
+      const raw = err?.response?.data;
       const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error   ||
-        err?.response?.data          ||
+        typeof raw === 'string'   ? raw :
+        raw?.message              ? raw.message :
+        raw?.error                ? raw.error :
         'Booking failed. Please try again.';
-      setErrors({ general: typeof msg === 'string' ? msg : 'Booking failed. Please try again.' });
+      setErrors({ general: msg });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm(f => ({ ...f, [k]: k === 'peopleCount' ? Number(e.target.value) : e.target.value }));
-    setErrors(prev => ({ ...prev, [k]: undefined }));
-  };
+  const setField = (k: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const val = k === 'peopleCount' ? Math.max(1, Number(e.target.value)) : e.target.value;
+      setForm(f => ({ ...f, [k]: val }));
+      setErrors(prev => ({ ...prev, [k]: undefined, general: undefined }));
+    };
 
-  /* ── Loading state ── */
+  /* ─── Loading ─── */
   if (loading) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          style={{ width: 36, height: 36, borderRadius: '50%', border: `3px solid rgba(57,255,150,0.2)`,
-            borderTopColor: T.green, margin: '0 auto 12px' }} />
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          style={{
+            width: 36, height: 36, borderRadius: '50%', margin: '0 auto 12px',
+            border: `3px solid rgba(57,255,150,0.2)`, borderTopColor: T.green,
+          }}
+        />
         <p style={{ color: T.textMuted, fontSize: 13, fontWeight: 600 }}>Loading slot details…</p>
       </div>
     </div>
   );
 
-  /* ── Confirmed state ── */
-  if (confirmed) return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
-      <ConfirmationPage booking={confirmed} onBack={() => navigate('/')} />
-    </div>
-  );
-
-  /* ── Error (slot not found) ── */
+  /* ─── Slot load failed ─── */
   if (!slot && errors.general) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
       <div style={{ ...cardStyle, padding: 32, textAlign: 'center', maxWidth: 420 }}>
         <AlertCircle size={36} color={T.red} style={{ margin: '0 auto 14px' }} />
-        <p style={{ fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 8 }}>{errors.general}</p>
+        <p style={{ fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 16 }}>{errors.general}</p>
         <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
           onClick={() => navigate(-1)}
-          style={{ padding: '10px 20px', borderRadius: 12, border: 'none',
+          style={{
+            padding: '10px 20px', borderRadius: 12, border: 'none',
             background: `linear-gradient(135deg, ${T.green}, #22C55E)`,
-            color: '#050D18', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+            color: '#050D18', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+          }}>
           Go Back
         </motion.button>
       </div>
     </div>
   );
 
-  /* ── Booking Form ── */
+  /* ─── Confirmation ─── */
+  if (confirmed) return (
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
+      <ConfirmationPage booking={confirmed} onBack={() => navigate('/')} />
+    </div>
+  );
+
+  /* ─── Booking Form ─── */
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', position: 'relative' }}>
 
@@ -446,7 +462,7 @@ export default function BookingConfirm() {
             display: 'inline-flex', alignItems: 'center', gap: 6,
             fontSize: 12, fontWeight: 600, color: T.textMuted,
             background: 'none', border: 'none', cursor: 'pointer',
-            fontFamily: 'inherit', marginBottom: 24, padding: 0, transition: 'color 0.2s',
+            fontFamily: 'inherit', marginBottom: 24, padding: 0,
           }}
           onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = T.green}
           onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = T.textMuted}
@@ -454,12 +470,13 @@ export default function BookingConfirm() {
           <ArrowLeft size={15} /> Back to Offer
         </motion.button>
 
-        {/* Page title */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
-              color: 'rgba(57,255,150,0.6)' }}>⚡ COMPLETE YOUR BOOKING</span>
-          </div>
+        {/* Title */}
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+          style={{ marginBottom: 28 }}>
+          <p style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+            textTransform: 'uppercase', color: 'rgba(57,255,150,0.6)', marginBottom: 6,
+          }}>⚡ Complete Your Booking</p>
           <h1 style={{
             fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: -0.5,
             background: `linear-gradient(135deg, #F7FAFC 40%, ${T.green} 100%)`,
@@ -480,10 +497,11 @@ export default function BookingConfirm() {
             <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${T.green}, transparent)`, opacity: 0.5 }} />
 
             <div style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 22 }}>
-
               <div>
                 <h2 style={{ fontSize: 14, fontWeight: 700, color: T.text, margin: '0 0 4px' }}>Your Details</h2>
-                <p style={{ fontSize: 11, color: T.textMuted, margin: 0 }}>Fields marked <span style={{ color: T.red }}>*</span> are required.</p>
+                <p style={{ fontSize: 11, color: T.textMuted, margin: 0 }}>
+                  Fields marked <span style={{ color: T.red }}>*</span> are required.
+                </p>
               </div>
 
               {/* General error */}
@@ -507,57 +525,57 @@ export default function BookingConfirm() {
               <Field label="Customer Name" icon={User} required error={errors.customerName}>
                 <input
                   type="text" value={form.customerName}
-                  onChange={set('customerName')}
+                  onChange={setField('customerName')}
                   placeholder="Enter your full name"
                   onFocus={() => setFocused('name')} onBlur={() => setFocused(null)}
                   style={inputStyle(focused === 'name', !!errors.customerName)}
                 />
               </Field>
 
-              {/* Phone Number */}
+              {/* Phone */}
               <Field label="Phone Number" icon={Phone} required error={errors.customerPhone}>
                 <input
                   type="tel" value={form.customerPhone}
-                  onChange={set('customerPhone')}
+                  onChange={setField('customerPhone')}
                   placeholder="+91 98765 43210"
                   onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)}
                   style={inputStyle(focused === 'phone', !!errors.customerPhone)}
                 />
               </Field>
 
-              {/* Email (optional) */}
+              {/* Email */}
               <Field label="Email Address" icon={Mail} error={errors.customerEmail}>
                 <input
                   type="email" value={form.customerEmail}
-                  onChange={set('customerEmail')}
+                  onChange={setField('customerEmail')}
                   placeholder="you@email.com (optional)"
                   onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
                   style={inputStyle(focused === 'email', !!errors.customerEmail)}
                 />
               </Field>
 
-              {/* Number of people */}
+              {/* People */}
               <Field label="Number of People" icon={Users} required error={errors.peopleCount}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <input
                     type="number" value={form.peopleCount}
-                    onChange={set('peopleCount')}
+                    onChange={setField('peopleCount')}
                     min={1} max={slot?.maxBookingPerCustomer ?? 20}
                     onFocus={() => setFocused('people')} onBlur={() => setFocused(null)}
-                    style={{ ...inputStyle(focused === 'people', !!errors.peopleCount), width: 120 }}
+                    style={{ ...inputStyle(focused === 'people', !!errors.peopleCount), width: 110 }}
                   />
                   <span style={{ fontSize: 11, color: T.textMuted }}>
-                    Max {slot?.maxBookingPerCustomer ?? '—'} · {slot?.availableCount ?? '—'} seats available
+                    Max {slot?.maxBookingPerCustomer ?? '—'} · {slot?.availableCount ?? '—'} seats left
                   </span>
                 </div>
               </Field>
 
-              {/* Special Note (optional) */}
+              {/* Special Note */}
               <Field label="Special Note" icon={FileText}>
                 <textarea
                   value={form.specialNote}
-                  onChange={set('specialNote')}
-                  placeholder="Any special requests or notes… (optional)"
+                  onChange={setField('specialNote')}
+                  placeholder="Any special requests… (optional)"
                   rows={3}
                   onFocus={() => setFocused('note')} onBlur={() => setFocused(null)}
                   style={{
@@ -567,13 +585,15 @@ export default function BookingConfirm() {
                 />
               </Field>
 
-              {/* Selected slot info */}
+              {/* Selected slot summary */}
               <div style={{
                 padding: '14px 16px', borderRadius: 14,
                 background: T.greenDim, border: `1px solid ${T.greenBorder}`,
               }}>
-                <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
-                  color: 'rgba(57,255,150,0.6)', margin: '0 0 10px' }}>Selected Slot</p>
+                <p style={{
+                  fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.1em', color: 'rgba(57,255,150,0.6)', margin: '0 0 10px',
+                }}>Selected Slot</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Calendar size={13} color={T.green} />
@@ -590,7 +610,7 @@ export default function BookingConfirm() {
                 </div>
               </div>
 
-              {/* Submit button */}
+              {/* Submit */}
               <motion.button
                 onClick={handleSubmit}
                 disabled={submitting}
@@ -625,9 +645,11 @@ export default function BookingConfirm() {
             <div style={{ ...cardStyle }}>
               <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${T.cyan}, transparent)`, opacity: 0.5 }} />
               <div style={{ padding: '20px 22px' }}>
-                <h2 style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 16px' }}>Booking Summary</h2>
+                <h2 style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 16px' }}>
+                  Booking Summary
+                </h2>
 
-                {/* Offer */}
+                {/* Offer name + business */}
                 <div style={{ marginBottom: 16 }}>
                   <p style={{ fontSize: 15, fontWeight: 800, color: T.text, margin: '0 0 3px', lineHeight: 1.3 }}>
                     {slot?.offerTitle ?? '—'}
@@ -637,7 +659,7 @@ export default function BookingConfirm() {
                   </p>
                 </div>
 
-                {/* Slot */}
+                {/* Slot info */}
                 <div style={{
                   padding: '12px 14px', borderRadius: 12, marginBottom: 16,
                   background: 'rgba(255,255,255,0.03)', border: `1px solid ${T.border}`,
@@ -646,7 +668,9 @@ export default function BookingConfirm() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Calendar size={12} color={T.textMuted} />
                     <span style={{ fontSize: 12, color: T.textSec, fontWeight: 600 }}>
-                      {slot ? new Date(slot.slotDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '—'}
+                      {slot
+                        ? new Date(slot.slotDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+                        : '—'}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -658,7 +682,7 @@ export default function BookingConfirm() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Users size={12} color={T.textMuted} />
                     <span style={{ fontSize: 12, color: T.textSec }}>
-                      {slot?.availableCount ?? '—'} of {slot?.capacity ?? '—'} seats left
+                      {slot?.availableCount ?? '—'} of {slot?.capacity ?? '—'} seats available
                     </span>
                   </div>
                 </div>
@@ -676,9 +700,9 @@ export default function BookingConfirm() {
                   ))}
                   {slot && (
                     <div style={{
-                      display: 'flex', justifyContent: 'space-between', padding: '8px 12px',
-                      borderRadius: 10, background: T.greenDim, border: `1px solid ${T.greenBorder}`,
-                      fontSize: 12, marginTop: 2,
+                      display: 'flex', justifyContent: 'space-between',
+                      padding: '8px 12px', borderRadius: 10, marginTop: 2,
+                      background: T.greenDim, border: `1px solid ${T.greenBorder}`, fontSize: 12,
                     }}>
                       <span style={{ fontWeight: 700, color: T.green }}>You Save</span>
                       <span style={{ fontWeight: 800, color: T.green }}>
@@ -691,9 +715,8 @@ export default function BookingConfirm() {
                 {/* People total */}
                 {slot && form.peopleCount > 1 && (
                   <div style={{
-                    marginTop: 12, padding: '10px 14px', borderRadius: 12,
+                    marginTop: 12, padding: '10px 14px', borderRadius: 12, fontSize: 12,
                     background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)',
-                    fontSize: 12,
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: T.textMuted }}>Total for {form.peopleCount} people</span>
@@ -705,15 +728,15 @@ export default function BookingConfirm() {
                 )}
 
                 <p style={{ fontSize: 10, color: T.textFaint, textAlign: 'center', marginTop: 16, lineHeight: 1.5 }}>
-                  By confirming, you agree to the offer's terms and conditions.
+                  By confirming you agree to the offer's terms and conditions.
                 </p>
               </div>
             </div>
           </motion.div>
+
         </div>
       </div>
 
-      {/* Spinner keyframe for Loader2 icon */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );

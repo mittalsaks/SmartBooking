@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, Mail, Lock, User, Phone,
-  Eye, EyeOff, WifiOff, AlertCircle, ChevronRight,
+  Eye, EyeOff, WifiOff, ChevronRight,
 } from 'lucide-react';
 import { loginNotificationUser, registerNotificationUser } from '../services/notificationApi';
 import { useToast } from '../components/ToastProvider';
@@ -86,7 +86,7 @@ export default function NotificationLogin() {
   const [loading,     setLoading]     = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const navigate    = useNavigate();
+  const navigate      = useNavigate();
   const { pushToast } = useToast();
 
   const switchMode = (m: 'login' | 'register') => {
@@ -121,7 +121,7 @@ export default function NotificationLogin() {
       const axiosMsg = !isError && typeof error === 'object' && error !== null
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
         : undefined;
-      const message  = isError ? error.message : axiosMsg || 'Unable to sign in. Please try again.';
+      const message   = isError ? error.message : axiosMsg || 'Unable to sign in. Please try again.';
       const isOffline = message.includes('offline') || message.includes('port 4000');
 
       if (isOffline) setServerError(message);
@@ -131,8 +131,20 @@ export default function NotificationLogin() {
     }
   };
 
-  return null;
-}        animate={{ opacity: 1, y: 0, scale: 1 }}
+  // ✅ Single return with all JSX inside
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#050D18',
+      padding: '24px 16px',
+      fontFamily: 'inherit',
+    }}>
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
         style={{
           width: '100%', maxWidth: 440,
@@ -240,7 +252,6 @@ export default function NotificationLogin() {
                 fontSize: 12, fontWeight: 700, cursor: 'pointer',
                 fontFamily: 'inherit', transition: 'all 0.18s',
                 background: mode === m ? T.greenDim : 'transparent',
-                border_: `1px solid ${mode === m ? T.greenBorder : 'transparent'}`,
                 color: mode === m ? T.green : T.textMuted,
                 boxShadow: mode === m ? `inset 0 0 0 1px ${T.greenBorder}` : 'none',
               }}

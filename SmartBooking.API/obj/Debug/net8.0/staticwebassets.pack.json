@@ -5,6 +5,42 @@
       "PackagePath": "staticwebassets\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg"
     },
     {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\1dee4d87-8112-46d4-a627-5faf4c75585a.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\1dee4d87-8112-46d4-a627-5faf4c75585a.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\5d137b07-1f23-40ee-970c-f894573af35e.png",
+      "PackagePath": "staticwebassets\\uploads\\offers\\5d137b07-1f23-40ee-970c-f894573af35e.png"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\64f3288b-ff51-45d5-9ee0-b3f3a865a57d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\64f3288b-ff51-45d5-9ee0-b3f3a865a57d.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\6d603591-97e2-428e-b83a-64957c38c699.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\6d603591-97e2-428e-b83a-64957c38c699.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\74863772-c3b4-4a10-984a-8f668111c772.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\74863772-c3b4-4a10-984a-8f668111c772.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\8faf97d7-6e80-4a2f-857b-b1ac66443c4f.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\8faf97d7-6e80-4a2f-857b-b1ac66443c4f.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\b8f535d2-6250-43c8-86f3-99887b30ea2f.avif",
+      "PackagePath": "staticwebassets\\uploads\\offers\\b8f535d2-6250-43c8-86f3-99887b30ea2f.avif"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\cb9f5d68-7217-4a68-aa3b-8a886c1cb054.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\cb9f5d68-7217-4a68-aa3b-8a886c1cb054.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\e9532c36-a8f3-410f-b943-7665101150ed.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\e9532c36-a8f3-410f-b943-7665101150ed.jpg"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.SmartBooking.API.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },
