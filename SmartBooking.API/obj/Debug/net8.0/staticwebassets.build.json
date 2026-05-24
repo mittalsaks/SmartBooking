@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "QUKQwldXBeB1lL/cFMHQtWqLWHkCHeZbm7iAmMPMfSg=",
+  "Source": "SmartBooking.API",
+  "BasePath": "_content/SmartBooking.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "SmartBooking.API\\wwwroot",
+      "Source": "SmartBooking.API",
+      "ContentRoot": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\",
+      "BasePath": "_content/SmartBooking.API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg",
+      "SourceId": "SmartBooking.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\",
+      "BasePath": "_content/SmartBooking.API",
+      "RelativePath": "uploads/offers/0d702894-fc38-4886-a760-3d71b039b6dd.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg"
+    }
+  ]
+}

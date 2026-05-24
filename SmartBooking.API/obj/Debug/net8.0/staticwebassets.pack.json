@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.SmartBooking.API.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.SmartBooking.API.props",
+      "PackagePath": "build\\SmartBooking.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.SmartBooking.API.props",
+      "PackagePath": "buildMultiTargeting\\SmartBooking.API.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.SmartBooking.API.props",
+      "PackagePath": "buildTransitive\\SmartBooking.API.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
