@@ -559,7 +559,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 
 ## 👨‍💻 Authors
 
-- **Saksham Mittal** - Full-Stack Developer
+- **Sakshi Mittal** - Full-Stack Developer
 - **GitHub:** [@mittalsaks](https://github.com/mittalsaks)
 
 ---
