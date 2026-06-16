@@ -6,18 +6,19 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
+  const headers = config.headers ?? {};
+
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    (headers as Record<string, string>).Authorization = `Bearer ${token}`;
   }
 
-  if (!(config.data instanceof FormData)) {
-    config.headers['Content-Type'] = 'application/json';
+  if (config.data instanceof FormData) {
+    delete (headers as Record<string, string>)['Content-Type'];
+  } else {
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
   }
 
-  // Debug — remove after fix confirmed
-  //console.log('Request Content-Type:', config.headers['Content-Type']);
-  //console.log('Is FormData:', config.data instanceof FormData);
-
+  config.headers = headers;
   return config;
 });
 

@@ -54,5 +54,17 @@ namespace SmartBooking.API.Controllers
             
             return Ok(response);
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _authService.ForgotPasswordAsync(request.Email);
+            return Ok(new { message = "If this email exists, a reset link has been sent." });
+        }
     }
 }

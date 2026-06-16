@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\0b3ed7e2-0a90-43f9-a9f5-a1a5a834ec90.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\0b3ed7e2-0a90-43f9-a9f5-a1a5a834ec90.jpg"
+    },
+    {
       "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg",
       "PackagePath": "staticwebassets\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg"
     },
@@ -27,6 +31,10 @@
     {
       "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\8faf97d7-6e80-4a2f-857b-b1ac66443c4f.jpg",
       "PackagePath": "staticwebassets\\uploads\\offers\\8faf97d7-6e80-4a2f-857b-b1ac66443c4f.jpg"
+    },
+    {
+      "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\ae7f77df-209b-45d3-9593-6c44d5887288.jpg",
+      "PackagePath": "staticwebassets\\uploads\\offers\\ae7f77df-209b-45d3-9593-6c44d5887288.jpg"
     },
     {
       "Id": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\b8f535d2-6250-43c8-86f3-99887b30ea2f.avif",

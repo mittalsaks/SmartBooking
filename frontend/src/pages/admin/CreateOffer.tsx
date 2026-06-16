@@ -8,6 +8,7 @@ import {
   CheckCircle, Loader2, Sparkles, ArrowLeft, Zap
 } from 'lucide-react';
 import axiosClient from '../../api/axiosClient';
+import { useToast } from '../../components/ToastProvider';
 
 export interface CreateOfferData {
   title: string;
@@ -115,7 +116,7 @@ const inputStyle = (hasError?: boolean): React.CSSProperties => ({
 });
 
 /* ── Image Upload ── */
-function ImageUpload({ register, watch }: { register: any; watch: any }) {
+function ImageUpload({ register }: { register: any }) {
   const [preview, setPreview]   = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -264,6 +265,7 @@ function ImageUpload({ register, watch }: { register: any; watch: any }) {
 ───────────────────────────────────────── */
 export default function CreateOffer() {
   const navigate = useNavigate();
+  const { pushToast } = useToast();
   const [submitState, setSubmitState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -320,21 +322,23 @@ export default function CreateOffer() {
       fd.append('termsAndConditions',    data.termsAndConditions ?? '');
       fd.append('status',                data.status);
       fd.append('businessId',            '1');
+      fd.append('imageUrl',              '');
       if (data.imageFile?.[0]) fd.append('imageFile', data.imageFile[0]);
 
-      /* ─── FIX 2: Delete the Content-Type header so the browser sets
-             multipart/form-data WITH the correct boundary automatically ─── */
       await axiosClient.post('/offers', fd);
 
+      pushToast({ title: 'Success', message: 'Offer created successfully.', level: 'success' });
       window.localStorage.setItem('afterOfferChange', Date.now().toString());
       setSubmitState('success');
-      setTimeout(() => navigate('/admin/offers'), 1600);
+      setTimeout(() => navigate('/admin/offers'), 1400);
     } catch (error: any) {
       let msg = 'Failed to create offer.';
       if (typeof error.response?.data === 'string')       msg = error.response.data;
       else if (error.response?.data?.errors)
         msg = Object.values(error.response.data.errors).flat().join(' · ');
       else if (error.response?.data?.message)             msg = error.response.data.message;
+
+      pushToast({ title: 'Error', message: msg, level: 'error' });
       setSubmitError(msg);
       setSubmitState('error');
       console.error(error);
@@ -459,7 +463,7 @@ export default function CreateOffer() {
 
           {/* ── Section 2: Image Upload ── */}
           <FormSection icon={ImagePlus} title="Offer Image" accent="#22D3EE" delay={0.1}>
-            <ImageUpload register={register} watch={watch} />
+            <ImageUpload register={register} />
             <p className="text-[11px] mt-3 flex items-center gap-1.5" style={{ color: '#4A5568' }}>
               <span
                 className="inline-block w-1.5 h-1.5 rounded-full"

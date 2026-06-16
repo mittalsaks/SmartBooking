@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axiosClient from '../api/axiosClient';
+import { sendNotification } from '../services/notificationApi';
 import {
   ArrowLeft, User, Phone, Mail, Users, FileText,
   CheckCircle, Calendar, Clock, Building2, Zap,
@@ -377,6 +378,56 @@ export default function BookingConfirm() {
       if (form.specialNote.trim())   payload.specialNote   = form.specialNote.trim();
 
       const res = await axiosClient.post('/bookings', payload);
+      const handleSubmit = async () => {
+  const errs = validate();
+  if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+  setErrors({});
+  setSubmitting(true);
+  try {
+    const payload: Record<string, any> = {
+      slotId:        Number(slotId),
+      offerId:       slot?.offerId ?? 0,
+      customerName:  form.customerName.trim(),
+      customerPhone: form.customerPhone.trim(),
+      peopleCount:   form.peopleCount,
+    };
+    if (form.customerEmail.trim()) payload.customerEmail = form.customerEmail.trim();
+    if (form.specialNote.trim())   payload.specialNote   = form.specialNote.trim();
+
+    const res = await axiosClient.post('/bookings', payload);
+
+    // ✅ WhatsApp notification — fire and forget (booking cancel nahi hogi agar fail ho)
+    sendNotification({
+      userId:  0,           // guest booking hai toh 0, agar userId available ho toh woh do
+      type:    'booking_confirmation',
+      channel: 'email',
+      data: {
+        customerName:  form.customerName.trim(),
+        customerEmail: form.customerEmail.trim(),
+        bookingRef:    res.data.bookingReference || res.data.referenceNumber || `#${res.data.id}`,
+        offerTitle:    slot?.offerTitle    ?? '',
+        businessName:  slot?.businessName  ?? '',
+        slotDate:      slot?.slotDate      ?? '',
+        startTime:     slot?.startTime     ?? '',
+        endTime:       slot?.endTime       ?? '',
+        peopleCount:   form.peopleCount,
+        offerPrice:    slot?.offerPrice    ?? 0,
+      },
+    }).catch(err => console.warn('[WhatsApp] Notification failed silently:', err));
+
+    setConfirmed(res.data);
+  } catch (err: any) {
+    const raw = err?.response?.data;
+    const msg =
+      typeof raw === 'string' ? raw :
+      raw?.message            ? raw.message :
+      raw?.error              ? raw.error :
+      'Booking failed. Please try again.';
+    setErrors({ general: msg });
+  } finally {
+    setSubmitting(false);
+  }
+};
       setConfirmed(res.data);
     } catch (err: any) {
       const raw = err?.response?.data;

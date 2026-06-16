@@ -1,64 +1,75 @@
 import { Worker, Job } from 'bullmq';
 import { PrismaClient } from '@prisma/client';
-import IORedis from 'ioredis';
+import { redisConnection } from '../services/queueService';
 import { sendEmail, sendSms, sendWhatsApp } from '../utils/notificationChannels';
 import { buildNotificationHtml } from '../utils/emailTemplates';
 
 const prisma = new PrismaClient();
 
-// Create a guaranteed, direct connection to Upstash for this worker
-const workerConnection = new IORedis("rediss://default:gQAAAAAAAXPdAAIgcDJjODU5YTZmMzBhMTU0MjQyOTU4NDI1MzdmOGQ5NDFmNQ@unbiased-lark-95197.upstash.io:6379", {
-    maxRetriesPerRequest: null
-});
-
 export const startNotificationWorker = async () => {
-  new Worker('notifications', async (job: Job) => {
-    const { notificationId, userId, type, channel, payload } = job.data;
-    const notification = await prisma.notification.findUnique({ where: { id: notificationId } });
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+  const worker = new Worker(
+    'notifications',
+    async (job: Job) => {
+      const { notificationId, userId, type, channel, payload } = job.data;
 
-    if (!notification || !user) {
-      throw new Error('Notification or user missing');
-    }
+      const [notification, user] = await Promise.all([
+        prisma.notification.findUnique({ where: { id: notificationId } }),
+        prisma.user.findUnique({ where: { id: userId } }),
+      ]);
 
-    const template = buildNotificationHtml(type, payload as Record<string, any>);
-    const subject = template.subject;
-    const body = template.html;
-    const targetPhone = user.phone;
-
-    try {
-      if (channel === 'sms') {
-        if (!targetPhone) throw new Error('Recipient phone number is missing');
-        await sendSms(targetPhone, payload as Record<string, any>);
-      } else if (channel === 'whatsapp') {
-        if (!targetPhone) throw new Error('Recipient phone number is missing');
-        await sendWhatsApp(targetPhone, payload as Record<string, any>);
-      } else {
-        await sendEmail(user.email, subject, body);
+      // ✅ Sirf notification check karo — user null ho sakta hai guest booking mein
+      if (!notification) {
+        throw new Error(`Notification ${notificationId} not found`);
       }
 
-      await prisma.notification.update({
-        where: { id: notificationId },
-        data: {
-          status: 'sent',
-          sentAt: new Date(),
-          retries: job.attemptsMade,
-        },
-      });
-    } catch (error: any) {
-      const message = error?.message || 'Unknown send error';
-      await prisma.notification.update({
-        where: { id: notificationId },
-        data: {
-          status: 'failed',
-          error: message,
-          retries: job.attemptsMade,
-        },
-      });
-      throw error;
+      const template = buildNotificationHtml(type, payload as Record<string, any>);
+
+      try {
+        if (channel === 'sms') {
+          const toPhone = (payload as any).customerPhone || user?.phone;
+          if (!toPhone) throw new Error('Recipient phone number is missing for SMS');
+          await sendSms(toPhone, payload as Record<string, any>);
+
+        } else if (channel === 'whatsapp') {
+          // ✅ payload.customerPhone pehle try karo, phir user.phone
+          const toPhone = (payload as any).customerPhone || user?.phone;
+          if (!toPhone) throw new Error('Recipient phone number is missing for WhatsApp');
+          await sendWhatsApp(toPhone, payload as Record<string, any>);
+
+        } else {
+          // default: email
+          const toEmail = (payload as any).customerEmail || user?.email;
+          if (!toEmail) throw new Error('Recipient email is missing');
+          await sendEmail(toEmail, template.subject, template.html);
+        }
+
+        await prisma.notification.update({
+          where: { id: notificationId },
+          data: { status: 'sent', sentAt: new Date(), retries: job.attemptsMade },
+        });
+
+        console.log(`[Worker] Notification ${notificationId} sent via ${channel}`);
+
+      } catch (error: any) {
+        const message = error?.message || 'Unknown send error';
+        await prisma.notification.update({
+          where: { id: notificationId },
+          data: { status: 'failed', error: message, retries: job.attemptsMade },
+        });
+        console.error(`[Worker] Notification ${notificationId} failed: ${message}`);
+        throw error;
+      }
+    },
+    {
+      connection: redisConnection,
+      autorun: true,
+      concurrency: 5,
     }
-  }, {
-    connection: workerConnection, // <-- NOW USING THE DIRECT CONNECTION
-    autorun: true,
-  });
+  );
+
+  worker.on('completed', (job) => console.log(`[Worker] Job ${job.id} completed`));
+  worker.on('failed', (job, err) => console.error(`[Worker] Job ${job?.id} failed:`, err.message));
+
+  console.log('[Worker] Notification worker started');
+  return worker;
 };

@@ -13,6 +13,7 @@ namespace SmartBooking.API.Services
     {
         Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request);
         Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
+        Task<bool> ForgotPasswordAsync(string email);
     }
 
     public class AuthService : IAuthService
@@ -36,6 +37,7 @@ namespace SmartBooking.API.Services
                 Name = request.Name,
                 Email = request.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Phone = request.Phone,
                 Role = request.Role
             };
 
@@ -60,6 +62,13 @@ namespace SmartBooking.API.Services
                 Token = token,
                 Message = "Login successful."
             };
+        }
+
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var found = await _context.Users.AnyAsync(u => u.Email == email);
+            Console.WriteLine($"Password reset requested for: {email}");
+            return found;
         }
 
         private string GenerateJwtToken(User user)

@@ -238,13 +238,15 @@ export default function MainLayout() {
           <Link to="/" className="nav-logo">SmartBooking</Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Link to="/notifications/login" className="nav-pill">
-              <span className="nav-pill-dot" />
-              Notifications
+            <Link to="/" className="nav-pill">
+              Home
             </Link>
-            <Link to="/login" className="nav-pill">
+            <Link to="/offers" className="nav-pill">
+              Browse Offers
+            </Link>
+            <Link to="/admin/login" className="nav-pill">
               <span className="nav-pill-dot" />
-              Admin Login
+              Business Portal
             </Link>
           </div>
         </nav>

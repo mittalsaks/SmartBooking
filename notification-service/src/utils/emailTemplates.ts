@@ -47,23 +47,31 @@ export const buildNotificationHtml = (type: string, payload: Record<string, any>
           </div>
         `,
       };
-    case 'booking_confirmation':
-      return {
-        subject: 'Booking Confirmed',
-        html: `
-          <div style="max-width:700px;margin:0 auto;background:#040714;border-radius:28px;overflow:hidden;border:1px solid rgba(16,185,129,0.14);">
-            ${header}
-            <div style="padding:32px;color:#e2e8f0;font-family:Inter,sans-serif;line-height:1.7;">
-              <p>Great news — your booking is confirmed.</p>
-              <p><strong>Offer:</strong> ${payload.offerTitle || 'Smart Offer'}</p>
-              <p><strong>Date:</strong> ${payload.date || 'TBD'} | <strong>Time:</strong> ${payload.time || 'TBD'}</p>
-              <p>${payload.message || 'Our team will contact you if any changes occur.'}</p>
-              ${baseButton('View Booking', payload.url || 'https://yourapp.example.com/bookings')}
-            </div>
-            ${footer}
+case 'booking_confirmation':
+  return {
+    subject: `Booking Confirmed — ${payload.bookingRef || 'SmartBooking'}`,
+    html: `
+      <div style="max-width:700px;margin:0 auto;background:#040714;border-radius:28px;overflow:hidden;border:1px solid rgba(16,185,129,0.14);">
+        ${header}
+        <div style="padding:32px;color:#e2e8f0;font-family:Inter,sans-serif;line-height:1.7;">
+          <p>Hi <strong>${payload.customerName || 'there'}</strong>! 🎉 Your booking is confirmed.</p>
+          
+          <div style="background:#0f172a;border-radius:16px;padding:20px;margin:20px 0;border:1px solid rgba(16,185,129,0.2);">
+            <p style="margin:0 0 10px;"><span style="color:#94a3b8;">📋 Booking Ref:</span> <strong style="color:#10b981;">${payload.bookingRef || 'N/A'}</strong></p>
+            <p style="margin:0 0 10px;"><span style="color:#94a3b8;">🎯 Offer:</span> <strong>${payload.offerTitle || 'Smart Offer'}</strong></p>
+            <p style="margin:0 0 10px;"><span style="color:#94a3b8;">🏪 Business:</span> <strong>${payload.businessName || 'N/A'}</strong></p>
+            <p style="margin:0 0 10px;"><span style="color:#94a3b8;">📅 Date:</span> <strong>${payload.slotDate || payload.date || 'TBD'}</strong></p>
+            <p style="margin:0 0 10px;"><span style="color:#94a3b8;">⏰ Time:</span> <strong>${payload.startTime || 'TBD'} – ${payload.endTime || ''}</strong></p>
+            <p style="margin:0;"><span style="color:#94a3b8;">👥 People:</span> <strong>${payload.peopleCount || 1}</strong></p>
           </div>
-        `,
-      };
+
+          <p style="color:#94a3b8;font-size:14px;">Show this email at the venue to redeem your offer. 🙌</p>
+          ${baseButton('View Booking', payload.url || 'https://yourapp.example.com/bookings')}
+        </div>
+        ${footer}
+      </div>
+    `,
+  };
     case 'booking_cancellation':
       return {
         subject: 'Booking Cancelled',
