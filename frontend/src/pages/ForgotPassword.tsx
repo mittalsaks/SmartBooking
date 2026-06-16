@@ -14,7 +14,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5237/api/Auth/forgot-password', {
+      const response = await axios.post('https://smartbooking-pmww.onrender.com/api/Auth/forgot-password', {
         email,
       });
 

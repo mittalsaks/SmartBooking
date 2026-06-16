@@ -30,7 +30,7 @@ export interface EditOfferData {
 
 const CATEGORIES = ['Restaurant','Gym','Salon','Clinic','Coaching','Turf','Spa','Other'];
 const STATUSES   = ['Draft','Active','Paused','Expired','Cancelled'];
-const BACKEND_URL = 'http://localhost:5237';
+const BACKEND_URL = 'https://smartbooking-pmww.onrender.com';
 
 /* ─────────────────── Helpers ─────────────────── */
 // Convert "HH:mm:ss" or "HH:mm:ss.fffffff" → "HH:mm" for <input type="time">

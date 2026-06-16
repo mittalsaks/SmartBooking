@@ -11,7 +11,7 @@ import {
 /* ─────────────────────────────────────
    IMAGE HELPER
 ───────────────────────────────────── */
-const BACKEND_URL = 'http://localhost:5237';
+const BACKEND_URL = 'https://smartbooking-pmww.onrender.com';
 const getImageUrl = (path?: string | null): string => {
   if (!path) return '';
   if (path.startsWith('http')) return path;

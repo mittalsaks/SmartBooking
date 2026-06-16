@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:5237/api',
+  baseURL: 'https://smartbooking-pmww.onrender.com/api',
 });
 
 axiosClient.interceptors.request.use((config) => {

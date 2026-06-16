@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://localhost:5237';
+const BACKEND_URL = 'https://smartbooking-pmww.onrender.com';
 
 export const getImageUrl = (path?: string | null): string => {
   if (!path) return '';

@@ -36,7 +36,7 @@ export default function AdminRegister() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5237/api/Auth/register', {
+      const response = await axios.post('https://smartbooking-pmww.onrender.com/api/Auth/register', {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,

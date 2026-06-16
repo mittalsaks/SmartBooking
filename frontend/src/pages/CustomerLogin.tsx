@@ -15,7 +15,7 @@ export default function CustomerLogin() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5237/api/Auth/login', {
+      const response = await axios.post('https://smartbooking-pmww.onrender.com/api/Auth/login', {
         email,
         password,
       });
