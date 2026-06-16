@@ -303,60 +303,67 @@ export default function CreateOffer() {
     setSubmitState('loading');
     setSubmitError(null);
     try {
-      // ✅ NAYA CODE: Browser se asli logged-in Business ki ID nikal rahe hain
-      const realBusinessId = localStorage.getItem('businessId'); 
+        // 1. Token se ID nikalne ka permanent logic
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error("You are not logged in.");
+        }
 
-      // ✅ Agar login ID nahi mili, toh error dikhao aur yahin ruk jao
-      if (!realBusinessId) {
-        pushToast({ title: 'Error', message: 'Please login first! Business ID missing.', level: 'error' });
-        setSubmitState('error');
-        return; 
-      }
+        // Token decode kar rahe hain
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        // Check karo ki payload mein ID kis naam se hai (console mein jo object dikha tha)
+        // Agar 'nameid' ya 'sub' dikha tha, toh wahi use karo
+        const businessId = payload.nameid || payload.sub || payload.businessId;
 
-      const formatTime = (t: string) =>
-        t?.length === 5 ? `${t}:00` : (t ?? '00:00:00');
+        if (!businessId) {
+            throw new Error("Could not find Business ID in your login session.");
+        }
 
-      const fd = new FormData();
-      fd.append('title',                 data.title);
-      fd.append('description',           data.description ?? '');
-      fd.append('category',              data.category);
-      fd.append('originalPrice',         String(Number(data.originalPrice)));
-      fd.append('offerPrice',            String(Number(data.offerPrice)));
-      fd.append('discountPercentage',    String(Number(data.discountPercentage)));
-      fd.append('startDate',             data.startDate);
-      fd.append('endDate',               data.endDate);
-      fd.append('startTime',             formatTime(data.startTime));
-      fd.append('endTime',               formatTime(data.endTime));
-      fd.append('totalCapacity',         String(Number(data.totalCapacity)));
-      fd.append('maxBookingPerCustomer', String(Number(data.maxBookingPerCustomer)));
-      fd.append('termsAndConditions',    data.termsAndConditions ?? '');
-      fd.append('status',                data.status);
-      
-      // ✅ NAYA CODE: Yahan humne hardcoded '1' ki jagah asli ID daal di!
-      fd.append('businessId',            realBusinessId);
-      
-      fd.append('imageUrl',              '');
-      if (data.imageFile?.[0]) fd.append('imageFile', data.imageFile[0]);
+        const formatTime = (t: string) =>
+            t?.length === 5 ? `${t}:00` : (t ?? '00:00:00');
 
-      await axiosClient.post('/offers', fd);
+        const fd = new FormData();
+        fd.append('title', data.title);
+        fd.append('description', data.description ?? '');
+        fd.append('category', data.category);
+        fd.append('originalPrice', String(Number(data.originalPrice)));
+        fd.append('offerPrice', String(Number(data.offerPrice)));
+        fd.append('discountPercentage', String(Number(data.discountPercentage)));
+        fd.append('startDate', data.startDate);
+        fd.append('endDate', data.endDate);
+        fd.append('startTime', formatTime(data.startTime));
+        fd.append('endTime', formatTime(data.endTime));
+        fd.append('totalCapacity', String(Number(data.totalCapacity)));
+        fd.append('maxBookingPerCustomer', String(Number(data.maxBookingPerCustomer)));
+        fd.append('termsAndConditions', data.termsAndConditions ?? '');
+        fd.append('status', data.status);
+        
+        // ✅ Yahan hum dynamic ID bhej rahe hain
+        fd.append('businessId', businessId);
+        
+        fd.append('imageUrl', '');
+        if (data.imageFile?.[0]) fd.append('imageFile', data.imageFile[0]);
 
-      pushToast({ title: 'Success', message: 'Offer created successfully.', level: 'success' });
-      window.localStorage.setItem('afterOfferChange', Date.now().toString());
-      setSubmitState('success');
-      setTimeout(() => navigate('/admin/offers'), 1400);
+        await axiosClient.post('/offers', fd);
+
+        pushToast({ title: 'Success', message: 'Offer created successfully.', level: 'success' });
+        window.localStorage.setItem('afterOfferChange', Date.now().toString());
+        setSubmitState('success');
+        setTimeout(() => navigate('/admin/offers'), 1400);
+
     } catch (error: any) {
-      let msg = 'Failed to create offer.';
-      if (typeof error.response?.data === 'string')       msg = error.response.data;
-      else if (error.response?.data?.errors)
-        msg = Object.values(error.response.data.errors).flat().join(' · ');
-      else if (error.response?.data?.message)             msg = error.response.data.message;
-
-      pushToast({ title: 'Error', message: msg, level: 'error' });
-      setSubmitError(msg);
-      setSubmitState('error');
-      console.error(error);
+        let msg = error.message || 'Failed to create offer.';
+        if (error.response?.data) {
+            msg = typeof error.response.data === 'string' 
+                ? error.response.data 
+                : (error.response.data.message || 'Validation error');
+        }
+        pushToast({ title: 'Error', message: msg, level: 'error' });
+        setSubmitError(msg);
+        setSubmitState('error');
     }
-  };
+};
 
   const hasErrors = Object.keys(errors).length > 0;
 
