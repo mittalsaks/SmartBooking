@@ -1,430 +1,308 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, User, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, ChevronRight } from 'lucide-react';
-import axiosClient from '../api/axiosClient';
-import { useToast } from '../components/ToastProvider';
-
-const T = {
-  card: 'rgba(10,20,36,0.82)',
-  border: 'rgba(255,255,255,0.07)',
-  green: '#39FF96',
-  greenDim: 'rgba(57,255,150,0.09)',
-  greenBorder: 'rgba(57,255,150,0.22)',
-  red: '#F87171',
-  text: '#F0FDF4',
-  textMuted: '#94A3B8',
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '11px 14px',
-  borderRadius: 12,
-  fontSize: 13,
-  fontWeight: 500,
-  color: T.text,
-  background: 'rgba(255,255,255,0.04)',
-  border: `1px solid ${T.border}`,
-  outline: 'none',
-  fontFamily: 'inherit',
-  boxSizing: 'border-box',
-  transition: 'all 0.2s ease',
-};
-
-function Field({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: T.textMuted, fontSize: 12, fontWeight: 600 }}>
-        {icon}
-        <span>{label}</span>
-      </div>
-      {children}
-    </div>
-  );
-}
+import { Eye, EyeOff } from 'lucide-react';
+import axios from 'axios';
 
 export default function AdminRegister() {
   const navigate = useNavigate();
-  const { pushToast } = useToast();
-
-  const [businessName, setBusinessName] = useState('');
-  const [ownerName, setOwnerName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [businessType, setBusinessType] = useState('');
-  const [city, setCity] = useState('');
-  const [showPw, setShowPw] = useState(false);
-  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
+
     try {
-      const response = await axiosClient.post('/Auth/register', {
-        name: ownerName,
-        email,
-        phone,
-        password,
-        role: 1, // 1 = BusinessOwner
+      const response = await axios.post('http://localhost:5237/api/Auth/register', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        role: 1, // BusinessOwner
       });
 
-      if (response.data?.isSuccess) {
-        pushToast({
-          title: 'Business Registered',
-          message: 'Your account is ready. Redirecting to login...',
-          level: 'success',
-        });
-        setTimeout(() => navigate('/admin/login'), 1500);
+      if (response.data.isSuccess) {
+        navigate('/admin/login');
       } else {
-        setError(response.data?.message || 'Registration failed');
+        setError(response.data.message || 'Registration failed');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Unable to register. Please try again.');
+      setError(err.response?.data?.message || 'Failed to register. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#070D1A',
-      position: 'relative',
-      overflow: 'hidden',
-      padding: '24px',
-    }}>
-      {/* Background orbs */}
-      <div style={{
-        position: 'absolute', top: '-15%', left: '10%',
-        width: 500, height: 400, borderRadius: '50%',
-        background: 'radial-gradient(ellipse, rgba(57,255,150,0.06) 0%, transparent 70%)',
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: '-10%', right: '10%',
-        width: 350, height: 350, borderRadius: '50%',
-        background: 'radial-gradient(ellipse, rgba(34,211,238,0.05) 0%, transparent 70%)',
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-      }} />
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #070D1A 0%, #0f1425 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        fontFamily: "'Space Grotesk', system-ui, sans-serif",
+      }}
+    >
+      <style>{`
+        .register-form {
+          width: 100%;
+          max-width: 450px;
+          background: rgba(10, 20, 36, 0.7);
+          border: 1px solid rgba(57, 255, 150, 0.2);
+          padding: 40px;
+          border-radius: 16px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
 
-      <motion.div
-        initial={{ opacity: 0, y: 28, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          width: '100%',
-          maxWidth: 460,
-          background: T.card,
-          border: `1px solid ${T.border}`,
-          borderRadius: 24,
-          backdropFilter: 'blur(24px)',
-          padding: '40px 36px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Top glow line */}
-        <div style={{
-          position: 'absolute', top: 0, left: '20%', right: '20%', height: 1,
-          background: `linear-gradient(90deg, transparent, ${T.green}, transparent)`,
-          opacity: 0.6,
-        }} />
+        .register-title {
+          font-family: 'Syne', sans-serif;
+          font-size: 1.8rem;
+          font-weight: 900;
+          color: #F0FDF4;
+          margin-bottom: 10px;
+          text-align: center;
+        }
 
-        {/* Building icon */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-          <motion.div
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 18,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: T.greenDim,
-              border: `1px solid ${T.greenBorder}`,
-            }}
-          >
-            <Building2 size={24} color={T.green} strokeWidth={1.8} />
-          </motion.div>
-        </div>
+        .register-subtitle {
+          color: #b4b4b4;
+          text-align: center;
+          margin-bottom: 30px;
+          font-size: 0.95rem;
+        }
 
-        {/* Breadcrumb */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginBottom: 10 }}>
-          <span style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            color: 'rgba(57,255,150,0.55)',
-          }}>
-            Business Portal
-          </span>
-          <ChevronRight size={10} color={T.textMuted} />
-          <span style={{ fontSize: 9, color: T.textMuted, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            Register
-          </span>
-        </div>
+        .form-group {
+          margin-bottom: 18px;
+        }
 
-        {/* Title */}
-        <h2 style={{
-          fontSize: 22,
-          fontWeight: 800,
-          textAlign: 'center',
-          margin: '0 0 28px',
-          letterSpacing: -0.4,
-          lineHeight: 1.2,
-          background: `linear-gradient(135deg, ${T.text} 30%, ${T.green} 100%)`,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-        }}>
-          Register Your Business
-        </h2>
+        .form-label {
+          display: block;
+          color: #F0FDF4;
+          margin-bottom: 8px;
+          font-weight: 500;
+          font-size: 0.95rem;
+        }
 
-        {/* Error */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -8, height: 0 }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 14px',
-                borderRadius: 12,
-                marginBottom: 20,
-                background: 'rgba(248,113,113,0.08)',
-                border: '1px solid rgba(248,113,113,0.25)',
-                color: T.red,
-                fontSize: 12,
-                fontWeight: 600,
-              }}
-            >
-              <AlertCircle size={14} style={{ flexShrink: 0 }} />
-              {error}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        .form-input {
+          width: 100%;
+          padding: 12px 14px;
+          background: rgba(20, 30, 50, 0.5);
+          border: 1px solid rgba(57, 255, 150, 0.3);
+          border-radius: 8px;
+          color: #F0FDF4;
+          font-size: 1rem;
+          font-family: inherit;
+          transition: all 0.3s ease;
+        }
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
-          {/* Owner Name */}
-          <Field label="Owner Name" icon={<User size={14} />}>
+        .form-input:focus {
+          outline: none;
+          border-color: #39FF96;
+          background: rgba(20, 30, 50, 0.8);
+          box-shadow: 0 0 0 3px rgba(57, 255, 150, 0.1);
+        }
+
+        .password-wrapper {
+          position: relative;
+        }
+
+        .password-toggle {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: #b4b4b4;
+          cursor: pointer;
+          padding: 4px;
+          transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+          color: #39FF96;
+        }
+
+        .error-message {
+          background: rgba(255, 82, 82, 0.1);
+          border: 1px solid rgba(255, 82, 82, 0.3);
+          color: #ff6b6b;
+          padding: 12px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+          font-size: 0.9rem;
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 12px;
+          background: linear-gradient(135deg, #39FF96, #00ff88);
+          color: #070D1A;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: inherit;
+          margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(57, 255, 150, 0.3);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .register-footer {
+          text-align: center;
+          margin-top: 20px;
+          color: #b4b4b4;
+          font-size: 0.9rem;
+        }
+
+        .register-footer a {
+          color: #39FF96;
+          text-decoration: none;
+          font-weight: 500;
+          transition: color 0.2s;
+        }
+
+        .register-footer a:hover {
+          color: #00ff88;
+        }
+      `}</style>
+
+      <div className="register-form">
+        <h1 className="register-title">Register Your Business</h1>
+        <p className="register-subtitle">Create your SmartBooking account</p>
+
+        {error && <div className="error-message">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Owner Name</label>
             <input
               type="text"
-              value={ownerName}
-              onChange={(e) => setOwnerName(e.target.value)}
-              placeholder="John Doe"
+              name="name"
+              className="form-input"
+              value={formData.name}
+              onChange={handleChange}
               required
-              style={inputStyle}
-              onFocus={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                e.currentTarget.style.borderColor = T.greenBorder;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                e.currentTarget.style.borderColor = T.border;
-              }}
+              placeholder="Your name"
             />
-          </Field>
+          </div>
 
-          {/* Email */}
-          <Field label="Email" icon={<Mail size={14} />}>
+          <div className="form-group">
+            <label className="form-label">Email</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="business@example.com"
+              name="email"
+              className="form-input"
+              value={formData.email}
+              onChange={handleChange}
               required
-              style={inputStyle}
-              onFocus={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                e.currentTarget.style.borderColor = T.greenBorder;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                e.currentTarget.style.borderColor = T.border;
-              }}
+              placeholder="business@email.com"
             />
-          </Field>
+          </div>
 
-          {/* Phone */}
-          <Field label="Phone" icon={<Phone size={14} />}>
+          <div className="form-group">
+            <label className="form-label">Phone</label>
             <input
               type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98765 43210"
-              style={inputStyle}
-              onFocus={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                e.currentTarget.style.borderColor = T.greenBorder;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                e.currentTarget.style.borderColor = T.border;
-              }}
+              name="phone"
+              className="form-input"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              placeholder="+1 (555) 000-0000"
             />
-          </Field>
+          </div>
 
-          {/* Password */}
-          <Field label="Password" icon={<Lock size={14} />}>
-            <div style={{ position: 'relative' }}>
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <div className="password-wrapper">
               <input
-                type={showPw ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 6 characters"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                className="form-input"
+                value={formData.password}
+                onChange={handleChange}
                 required
-                style={inputStyle}
-                onFocus={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                  e.currentTarget.style.borderColor = T.greenBorder;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  e.currentTarget.style.borderColor = T.border;
-                }}
+                placeholder="••••••••"
+                style={{ paddingRight: '40px' }}
               />
               <button
                 type="button"
-                onClick={() => setShowPw(!showPw)}
-                style={{
-                  position: 'absolute',
-                  right: 10,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: T.textMuted,
-                  padding: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-          </Field>
+          </div>
 
-          {/* Confirm Password */}
-          <Field label="Confirm Password" icon={<Lock size={14} />}>
-            <div style={{ position: 'relative' }}>
+          <div className="form-group">
+            <label className="form-label">Confirm Password</label>
+            <div className="password-wrapper">
               <input
-                type={showConfirmPw ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                className="form-input"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 required
-                style={inputStyle}
-                onFocus={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                  e.currentTarget.style.borderColor = T.greenBorder;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  e.currentTarget.style.borderColor = T.border;
-                }}
+                placeholder="••••••••"
+                style={{ paddingRight: '40px' }}
               />
               <button
                 type="button"
-                onClick={() => setShowConfirmPw(!showConfirmPw)}
-                style={{
-                  position: 'absolute',
-                  right: 10,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: T.textMuted,
-                  padding: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-          </Field>
+          </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              marginTop: 8,
-              padding: '12px 16px',
-              borderRadius: 12,
-              fontSize: 14,
-              fontWeight: 700,
-              background: T.green,
-              color: '#000',
-              border: 'none',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = `0 8px 20px rgba(57,255,150,0.3)`;
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
+          <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? 'Registering...' : 'Register Business'}
           </button>
         </form>
 
-        {/* Login link */}
-        <div style={{
-          marginTop: 20,
-          textAlign: 'center',
-          fontSize: 13,
-          color: T.textMuted,
-        }}>
-          Already registered?{' '}
-          <Link
-            to="/admin/login"
-            style={{
-              color: T.green,
-              textDecoration: 'none',
-              fontWeight: 700,
-              transition: 'opacity 0.2s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-          >
-            Sign in
-          </Link>
+        <div className="register-footer">
+          Already have an account?{' '}
+          <Link to="/admin/login">Login here</Link>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

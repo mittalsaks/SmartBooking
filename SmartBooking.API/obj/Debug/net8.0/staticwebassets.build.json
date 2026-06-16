@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "SFM7AXWor8GJlYul3IejKk89ps27mHkPbtsI4DDJ1BQ=",
+  "Hash": "g05kSzYSHfHvPuo1/vlfW0YPgS6c8h1JqO1MqDxk1v0=",
   "Source": "SmartBooking.API",
   "BasePath": "_content/SmartBooking.API",
   "Mode": "Default",
@@ -16,25 +16,6 @@
     }
   ],
   "Assets": [
-    {
-      "Identity": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\0b3ed7e2-0a90-43f9-a9f5-a1a5a834ec90.jpg",
-      "SourceId": "SmartBooking.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\",
-      "BasePath": "_content/SmartBooking.API",
-      "RelativePath": "uploads/offers/0b3ed7e2-0a90-43f9-a9f5-a1a5a834ec90.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\uploads\\offers\\0b3ed7e2-0a90-43f9-a9f5-a1a5a834ec90.jpg"
-    },
     {
       "Identity": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\0d702894-fc38-4886-a760-3d71b039b6dd.jpg",
       "SourceId": "SmartBooking.API",
@@ -167,25 +148,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\offers\\8faf97d7-6e80-4a2f-857b-b1ac66443c4f.jpg"
-    },
-    {
-      "Identity": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\ae7f77df-209b-45d3-9593-6c44d5887288.jpg",
-      "SourceId": "SmartBooking.API",
-      "SourceType": "Discovered",
-      "ContentRoot": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\",
-      "BasePath": "_content/SmartBooking.API",
-      "RelativePath": "uploads/offers/ae7f77df-209b-45d3-9593-6c44d5887288.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\uploads\\offers\\ae7f77df-209b-45d3-9593-6c44d5887288.jpg"
     },
     {
       "Identity": "F:\\FULLSTACK\\Hackathons\\BusinnessProblem\\SmartBooking.API\\wwwroot\\uploads\\offers\\b8f535d2-6250-43c8-86f3-99887b30ea2f.avif",

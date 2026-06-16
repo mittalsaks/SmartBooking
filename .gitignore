@@ -1,9 +1,0 @@
-# Environment files - KABHI PUSH MAT KARO
-**/.env
-**/node_modules
-**/bin
-**/obj
-
-# Build outputs
-**/dist
-**/.next

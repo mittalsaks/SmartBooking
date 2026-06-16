@@ -1,6 +1,5 @@
 import axios from 'axios';
 // BookingConfirm.tsx ke top pe yeh import add karo
-import { sendNotification } from '../services/notificationApi';
 
 const NOTIFICATION_BASE_URL = import.meta.env.VITE_NOTIFICATION_API_URL || 'http://localhost:4000/api';
 

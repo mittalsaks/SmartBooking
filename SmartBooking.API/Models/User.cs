@@ -18,8 +18,6 @@ namespace SmartBooking.API.Models
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
-        public string? Phone { get; set; }
-
         public UserRole Role { get; set; } = UserRole.Customer;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

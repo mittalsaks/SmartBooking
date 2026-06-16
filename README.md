@@ -222,7 +222,7 @@ Complete booking management with filtering, sorting, and status updates.
 Interactive Swagger/OpenAPI documentation for all backend endpoints.
 
 ![Swagger API Documentation](./images/Swagger%20images/Screenshot%202026-05-24%20225418.png)
-
+![Swagger API Documentation](./images/Swagger%20images/Screenshot%202026-05-24%20225429.png)
 **Available Endpoints:**
 - **Auth**: User registration and login
 - **Bookings**: Create, read, update, delete bookings
@@ -559,7 +559,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 
 ## 👨‍💻 Authors
 
-- **Saksham Mittal** - Full-Stack Developer
+- **Sakshi Mittal** - Full-Stack Developer
 - **GitHub:** [@mittalsaks](https://github.com/mittalsaks)
 
 ---

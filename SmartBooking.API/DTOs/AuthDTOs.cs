@@ -17,8 +17,6 @@ namespace SmartBooking.API.DTOs
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters long.")] 
         public string Password { get; set; } = string.Empty;
         
-        public string? Phone { get; set; }
-        
         public UserRole Role { get; set; } = UserRole.Customer;
     }
 
