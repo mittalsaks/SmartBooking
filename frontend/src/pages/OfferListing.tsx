@@ -413,7 +413,7 @@ export default function OfferListing() {
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '9px 18px', borderRadius: 12, border: 'none',
               background: showFilters ? T.greenDim : 'rgba(255,255,255,0.04)',
-              border_: `1px solid ${showFilters ? T.greenBorder : T.border}`,
+              border: `1px solid ${showFilters ? T.greenBorder : T.border}`,
               boxShadow: `inset 0 0 0 1px ${showFilters ? T.greenBorder : T.border}`,
               color: showFilters ? T.green : T.textSec,
               fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
