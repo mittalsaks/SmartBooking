@@ -303,6 +303,16 @@ export default function CreateOffer() {
     setSubmitState('loading');
     setSubmitError(null);
     try {
+      // ✅ NAYA CODE: Browser se asli logged-in Business ki ID nikal rahe hain
+      const realBusinessId = localStorage.getItem('businessId'); 
+
+      // ✅ Agar login ID nahi mili, toh error dikhao aur yahin ruk jao
+      if (!realBusinessId) {
+        pushToast({ title: 'Error', message: 'Please login first! Business ID missing.', level: 'error' });
+        setSubmitState('error');
+        return; 
+      }
+
       const formatTime = (t: string) =>
         t?.length === 5 ? `${t}:00` : (t ?? '00:00:00');
 
@@ -321,7 +331,10 @@ export default function CreateOffer() {
       fd.append('maxBookingPerCustomer', String(Number(data.maxBookingPerCustomer)));
       fd.append('termsAndConditions',    data.termsAndConditions ?? '');
       fd.append('status',                data.status);
-      fd.append('businessId',            '1');
+      
+      // ✅ NAYA CODE: Yahan humne hardcoded '1' ki jagah asli ID daal di!
+      fd.append('businessId',            realBusinessId);
+      
       fd.append('imageUrl',              '');
       if (data.imageFile?.[0]) fd.append('imageFile', data.imageFile[0]);
 
