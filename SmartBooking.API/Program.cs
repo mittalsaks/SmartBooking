@@ -100,4 +100,24 @@ if (app.Environment.IsDevelopment())
     await SlotSeeder.SeedSlotsAsync(context);
 }
 
+// ... upar ka code waise hi rahega ...
+
+app.MapControllers();
+
+// ✅ YEH NAYA CODE ADD KARNA HAI: Automatically create tables in database
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try 
+    {
+        context.Database.Migrate(); // Yeh khali DB mein saari tables bana dega!
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database migration failed: " + ex.Message);
+    }
+}
+
+// (Tumhara purana SeedSlots wala code agar zaroori hai toh rakh sakti ho, warna uski itni zaroorat nahi abhi)
+
 app.Run();
