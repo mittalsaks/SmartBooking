@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173","https://smart-booking-git-main-mittalsaks-projects.vercel.app")
+        policy.AllowAnyOrigin("http://localhost:5173","https://smart-booking-git-main-mittalsaks-projects.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -78,15 +78,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowReactApp");
 app.UseStaticFiles();
 //app.UseHttpsRedirection();
-app.UseCors("AllowReactApp");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
