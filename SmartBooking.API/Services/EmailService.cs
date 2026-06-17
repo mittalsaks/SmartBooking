@@ -37,8 +37,9 @@ namespace SmartBooking.API.Services
             string slotDate,
             string slotTime)
         {
-            var gmailUser = _config["Gmail:User"];
-            var gmailPass = _config["Gmail:AppPassword"];
+            // Isko yeh karo:
+            var gmailUser = _config["GMAIL_USER"];        // ✅ New
+            var gmailPass = _config["GMAIL_APP_PASSWORD"]; // ✅ New
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("SmartBooking", gmailUser));
