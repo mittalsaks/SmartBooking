@@ -1,12 +1,15 @@
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\appsettings.Development.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\appsettings.json
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.staticwebassets.runtime.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.exe
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.deps.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.runtimeconfig.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.pdb
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\BCrypt-Net-Next.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Humanizer.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\MailKit.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
@@ -26,6 +29,7 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Micro
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Microsoft.OpenApi.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\MimeKit.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Mono.TextTemplating.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Npgsql.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
@@ -39,6 +43,7 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\Syste
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\System.Composition.Runtime.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\System.Composition.TypedParts.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
@@ -91,6 +96,7 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\ru\Mi
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.csproj.AssemblyReference.cache
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.GeneratedMSBuildEditorConfig.editorconfig
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.AssemblyInfoInputs.cache
@@ -98,6 +104,7 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\Smart
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.csproj.CoreCompileInputs.cache
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.MvcApplicationPartsAssemblyInfo.cs
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.MvcApplicationPartsAssemblyInfo.cache
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.sourcelink.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\staticwebassets.build.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\staticwebassets.development.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\staticwebassets\msbuild.SmartBooking.API.Microsoft.AspNetCore.StaticWebAssets.props
@@ -112,10 +119,3 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\refin
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.pdb
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.genruntimeconfig.cache
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\ref\SmartBooking.API.dll
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.staticwebassets.runtime.json
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.sourcelink.json
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\MailKit.dll
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\MimeKit.dll
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
-F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
