@@ -28,11 +28,9 @@ namespace SmartBooking.API.Services
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
         {
-            // 1. Check if email exists
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                 return new AuthResponseDto { IsSuccess = false, Message = "Email already exists." };
 
-            // 2. Create the User
             var user = new User
             {
                 Name = request.Name,
@@ -42,17 +40,18 @@ namespace SmartBooking.API.Services
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync(); // User save hoga aur uski ek nayi 'Id' generate hogi
+            await _context.SaveChangesAsync(); 
 
-            // ✅ 3. PERMANENT FIX: Automatically create a Business for this new User
+            // Business creation with proper mapping
             try
             {
                 var business = new Business
                 {
-                    // Hum User ki Id ko hi Business ki Id bana rahe hain, 
-                    // kyunki frontend token se User Id ko hi businessId samajh kar bhej raha hai.
-                    Id = user.Id, 
-                    Name = user.Name + " Business"
+                    Name = user.Name + " Business",
+                    BusinessType = "Default", 
+                    OwnerName = user.Name,    
+                    Email = user.Email,       
+                    UserId = user.Id          
                 };
 
                 _context.Businesses.Add(business);
@@ -60,7 +59,6 @@ namespace SmartBooking.API.Services
             }
             catch (Exception ex)
             {
-                // Agar Business pehle se hai ya schema alag hai, toh application crash nahi hogi
                 Console.WriteLine("Business creation failed/skipped: " + ex.Message);
             }
 
@@ -73,9 +71,9 @@ namespace SmartBooking.API.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
 
-            // ✅ Fixed: removed duplicate Token, removed _jwtService (doesn't exist),
-            //           use local GenerateJwtToken(), and set IsSuccess = true
-            var token = GenerateJwtToken(user);
+            var business = await _context.Businesses.FirstOrDefaultAsync(b => b.UserId == user.Id);
+            
+            var token = GenerateJwtToken(user, business?.Id);
             return new AuthResponseDto
             {
                 IsSuccess = true,
@@ -84,18 +82,23 @@ namespace SmartBooking.API.Services
             };
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user, int? businessId)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
+
+            if (businessId.HasValue)
+            {
+                claims.Add(new Claim("businessId", businessId.Value.ToString()));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: _config["JwtSettings:Issuer"],
