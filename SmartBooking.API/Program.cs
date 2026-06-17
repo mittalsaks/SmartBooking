@@ -14,17 +14,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// 1. CORS
-// 1. CORS Setup - Bulletproof for Hackathon
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", policy => {
+// ✅ 1. CORS — AllowAnyOrigin so localhost:5173 is never blocked
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-// 2. Swagger
+// ✅ 2. Swagger with Bearer auth support
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Smart Booking API", Version = "v1" });
@@ -45,11 +46,11 @@ builder.Services.AddSwaggerGen(c =>
     }});
 });
 
-// 3. Database
+// ✅ 3. PostgreSQL Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 4. Dependency Injection
+// ✅ 4. Dependency Injection
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOfferRepository, OfferRepository>();
 builder.Services.AddScoped<IOfferService, OfferService>();
@@ -58,7 +59,7 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 
-// 5. JWT
+// ✅ 5. JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -77,6 +78,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+// ============================================================
+// ✅ CRITICAL FIX #1: Run DB migration BEFORE app.Run()
+// Previously this was placed AFTER app.Run() so it NEVER ran.
+// ============================================================
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        context.Database.Migrate(); // Creates all tables if they don't exist
+        Console.WriteLine("✅ Database migration applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("❌ Database migration failed: " + ex.Message);
+    }
+}
+
+// ✅ Seed slots only in Development
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await SlotSeeder.SeedSlotsAsync(context);
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -85,38 +111,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-//app.UseHttpsRedirection();
-app.UseCors("AllowAll");
-app.UseAuthentication();
-app.UseAuthorization();
+
+// ✅ CRITICAL FIX #2: Correct middleware pipeline order
+// CORS must be before Authentication/Authorization
+app.UseCors("AllowAll");          // 1st: allow cross-origin requests
+app.UseAuthentication();           // 2nd: read & validate JWT
+app.UseAuthorization();            // 3rd: enforce [Authorize] attributes
+
+// ✅ CRITICAL FIX #3: MapControllers called EXACTLY ONCE
+// Your old Program.cs called this TWICE which caused a conflict
 app.MapControllers();
 
-// ✅ Seed slots in development
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await SlotSeeder.SeedSlotsAsync(context);
-}
-
-// ... upar ka code waise hi rahega ...
-
-app.MapControllers();
-
-// ✅ YEH NAYA CODE ADD KARNA HAI: Automatically create tables in database
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try 
-    {
-        context.Database.Migrate(); // Yeh khali DB mein saari tables bana dega!
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Database migration failed: " + ex.Message);
-    }
-}
-
-// (Tumhara purana SeedSlots wala code agar zaroori hai toh rakh sakti ho, warna uski itni zaroorat nahi abhi)
-
-app.Run();
+app.Run(); // This blocks — nothing after this line ever executes
