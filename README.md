@@ -1,53 +1,47 @@
-# 🚀 SmartBooking - Notification Service Platform
+# 🚀 SmartBooking - Advanced Notification Service Platform
 
 <div align="center">
-  <img src="./frontend/public/logo.png" alt="SmartBooking Logo" width="800"/>
+  <img src="./frontend/public/logo.png" alt="SmartBooking Logo" width="220"/>
+  <br/>
+  
+  [![Frontend Deployment](https://img.shields.io/badge/Deployment-Vercel-blue?style=for-the-badge&logo=vercel)](https://smart-booking-dun-pi.vercel.app/)
+  [![Backend Service](https://img.shields.io/badge/API-Render-green?style=for-the-badge&logo=render)](https://smartbooking-pmww.onrender.com)
 </div>
 
 <br/>
 
-A modern, full-stack booking and real-time notification management system designed for seamless business operations.
+SmartBooking is an enterprise-grade, full-stack scheduling ecosystem and real-time notification engine. Designed with a sleek, high-performance glassmorphism interface, it allows businesses to dynamically deploy service offers, manage customer capacity, and instantly broadcast transactional notifications.
 
-## 🔗 Live Application
-* **Frontend (User Interface):** [SmartBooking Portal](https://smart-booking-dun-pi.vercel.app/)
-* **Backend (API Service):** [SmartBooking API](https://smartbooking-pmww.onrender.com)
+## 🔗 Live Deployments
+* **⚡ Production Frontend Portal:** [SmartBooking Client UI](https://smart-booking-dun-pi.vercel.app/)
+* **⚙️ Production Core API Gateway:** [SmartBooking API Hub](https://smartbooking-pmww.onrender.com)
 
 ---
 
-## 📸 Project Showcase & Key Features
+## 📸 Deep-Dive Feature Walkthrough & UI Showcase
 
-### 1. 📊 Dashboard
+### 1. 📊 Executive Admin Analytics Dashboard
 ![Admin Dashboard](./images/frontend%20images/Dashboard%20(2).png)
-**Real-time Business Insights:** The central command center for business owners. It provides live tracking of total bookings, generated revenue, and active offers. The modern dark-theme with glassmorphism UI ensures metrics are easy to read and visually engaging.
+**Real-time Metrics Aggregator:** Instantly monitors critical business indicators including Total Revenue Generated, Total Booking Inflow, and Active Marketing Offers in a Glassmorphic Command Center.
 
-### 2. 🏷️ Active Deals & Offer Management
+### 2. 🏷️ Dynamic Active Deals & Cloudinary Asset Control
 ![Offer Management](./images/frontend%20images/ActiveDeals.png)
-**Dynamic Business Control:** Admins can seamlessly create, pause, or update service offers on the fly. All service images are securely processed and permanently hosted via the **Cloudinary API**, ensuring no data loss during server restarts.
+**Persistent Media Pipeline:** Integrates natively with the Cloudinary API to guarantee that user-uploaded high-resolution offer banners remain online permanently.
 
-### 3. 📅 Customer Booking Experience
-![Explore Deals](./images/frontend%20images/BookingPage.png)
-**Seamless User Journey:** Customers can browse active services, view real-time availability slots, and book instantly. Every successful booking triggers the **Notification Engine**, sending an automated confirmation alert straight to the customer's email!
-
----
-
-## 🛠️ Tech Stack Architecture
-- **Backend Infrastructure:** ASP.NET Core 8 & PostgreSQL (Robust & Reliable Data Storage).
-- **Frontend Interface:** React 19 + TypeScript + Tailwind CSS (Highly responsive UI).
-- **Media Pipeline:** Cloudinary Integration (Persistent, cloud-based Image Hosting).
-- **Notification Engine:** Gmail SMTP Integration (Automated Transactional Emails).
-- **Interactive UX:** Framer Motion for buttery-smooth animations and state feedback.
+### 3. 📅 Frictionless Customer Booking Engine & Advanced Filtering
+![Explore Deals](./images/frontend%20images/ExploreDeals.png)
+**Live Countdown Clocks:** Integrated micro-timers display real-time hour/minute/second ticks for active sales, creating a psychological sense of urgency.
 
 ---
 
-## 🔐 Local Setup & Installation
-1. **Clone the repository:** `git clone https://github.com/mittalsaks/SmartBooking.git`
-2. **Environment Setup:** Add your `Cloudinary`, `JWT`, and `SMTP` credentials in your backend configuration (or Render Environment Variables).
-3. **Run the Services:** - Backend: `dotnet run` 
-   - Frontend: `npm run dev`
+## 🏗️ Technical Architecture & Ecosystem
 
----
-
-## 👨‍💻 Developed By
-**Sakshi Mittal** | [GitHub: @mittalsaks](https://github.com/mittalsaks)
-
-*Built with ❤️ for the Hackathon. Focused on clean architecture and scalable solutions.*
+```text
+[ React 19 Frontend Client ] 
+       │ (Secured Axios TLS Requests & Local JWT Validation)
+       ▼
+[ ASP.NET Core 8 Web API Gateway ]
+       │
+       ├─► [ PostgreSQL Relational Cluster ] ———► (Persistent App Data)
+       ├─► [ Cloudinary Image Content CDN ] ———► (Permanent Asset Storage)
+       └─► [ Google SMTP Mail Server Engine ] ──► (Instant Automated Notifications)
