@@ -1,6 +1,6 @@
 # 🚀 SmartBooking - Notification Service Platform
 
-![Logo](./images/logo.png) A modern, full-stack booking and real-time notification management system designed for seamless business operations.
+![Logo](.frontend/public/logo.png) A modern, full-stack booking and real-time notification management system designed for seamless business operations.
 
 ---
 
