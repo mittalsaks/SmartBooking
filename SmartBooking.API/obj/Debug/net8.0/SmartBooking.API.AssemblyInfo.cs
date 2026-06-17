@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartBooking.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec0d1089bf1ad631530ee1be26254a1e4cb09022")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e6924f34ea03547d762f981b4c225361a8ab972")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartBooking.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartBooking.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

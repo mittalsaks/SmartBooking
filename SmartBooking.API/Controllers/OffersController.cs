@@ -1,5 +1,5 @@
-using System;
-using System.IdentityModel.Tokens.Jwt;  // ✅ Fix: was missing, caused CS0103
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -47,7 +47,6 @@ namespace SmartBooking.API.Controllers
         {
             try
             {
-                // ✅ STEP 1: Extract UserId from JWT — never trust frontend
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
                                ?? User.FindFirst(JwtRegisteredClaimNames.Sub)
                                ?? User.FindFirst("sub");
@@ -55,7 +54,6 @@ namespace SmartBooking.API.Controllers
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return Unauthorized("User identity could not be resolved from token.");
 
-                // ✅ STEP 2: Fast path — get businessId from JWT claim
                 var businessIdClaim = User.FindFirst("businessId");
                 int businessId;
 
@@ -65,7 +63,6 @@ namespace SmartBooking.API.Controllers
                 }
                 else
                 {
-                    // ✅ STEP 3: Fallback — look up from DB if claim missing (old tokens)
                     var business = await _context.Businesses
                         .AsNoTracking()
                         .FirstOrDefaultAsync(b => b.UserId == userId);
@@ -76,7 +73,6 @@ namespace SmartBooking.API.Controllers
                     businessId = business.Id;
                 }
 
-                // ✅ STEP 4: Set BusinessId server-side — FK will never be 0
                 request.BusinessId = businessId;
 
                 if (request.OfferPrice >= request.OriginalPrice)
@@ -94,14 +90,8 @@ namespace SmartBooking.API.Controllers
                 var response = await _offerService.CreateOfferAsync(request);
                 return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
-            }
+            catch (ArgumentException ex) { return BadRequest(ex.Message); }
+            catch (Exception ex) { return StatusCode(500, "An unexpected error occurred: " + ex.Message); }
         }
 
         [HttpPut("{id}")]
@@ -114,17 +104,10 @@ namespace SmartBooking.API.Controllers
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return Unauthorized("User identity could not be resolved from token.");
 
-                var business = await _context.Businesses
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(b => b.UserId == userId);
+                var business = await _context.Businesses.AsNoTracking().FirstOrDefaultAsync(b => b.UserId == userId);
+                if (business == null) return BadRequest("No business profile found for this user.");
 
-                if (business == null)
-                    return BadRequest("No business profile found for this user.");
-
-                var existingOffer = await _context.Offers
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(o => o.Id == id);
-
+                var existingOffer = await _context.Offers.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
                 if (existingOffer == null) return NotFound("Offer not found.");
                 if (existingOffer.BusinessId != business.Id) return Forbid();
 
@@ -138,10 +121,7 @@ namespace SmartBooking.API.Controllers
                 if (!success) return NotFound();
                 return NoContent();
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            catch (ArgumentException ex) { return BadRequest(ex.Message); }
         }
 
         [HttpDelete("{id}")]
@@ -156,15 +136,11 @@ namespace SmartBooking.API.Controllers
         private async Task<string> SaveOfferImageAsync(IFormFile imageFile)
         {
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "offers");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
+            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
-
             await using var stream = new FileStream(filePath, FileMode.Create);
             await imageFile.CopyToAsync(stream);
-
             return $"/uploads/offers/{fileName}";
         }
     }
