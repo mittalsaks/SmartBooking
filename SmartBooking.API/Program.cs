@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,9 +19,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173","https://smart-booking-git-main-mittalsaks-projects.vercel.app",
+            "https://smart-booking-dun-pi.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod();
+              .AllowCredentials();
     });
 });
 
