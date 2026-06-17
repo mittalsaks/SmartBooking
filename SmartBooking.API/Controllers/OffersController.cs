@@ -22,7 +22,7 @@ namespace SmartBooking.API.Controllers
         private readonly IOfferService _offerService;
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
-        public OffersController(IOfferService offerService, AppDbContext context)
+        public OffersController(IOfferService offerService, AppDbContext context,IConfiguration configuration)
         {
             _offerService = offerService;
             _context = context;
