@@ -433,7 +433,7 @@ export default function Dashboard() {
     setError(null);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
-      const res = await axiosClient.get('/bookings/my-dashboard-stats');
+      const res = await axiosClient.get('/bookings/dashboard-stats');
       setStats(res.data);
     } catch {
       setError('Could not load dashboard data. Check your connection.');
