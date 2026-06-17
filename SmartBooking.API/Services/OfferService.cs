@@ -30,8 +30,8 @@ namespace SmartBooking.API.Services
         {
             var offers = await _repository.GetAllAsync();
             return offers.Select(MapToResponseDto);
-            .Where(o => o.BusinessId == businessId)  // ✅ Filter
-                .Select(MapToResponseDto);
+            // .Where(o => o.BusinessId == businessId)  // ✅ Filter
+            //     .Select(MapToResponseDto);
         }
 
         public async Task<OfferResponseDto?> GetOfferByIdAsync(int id)
