@@ -48,10 +48,15 @@ namespace SmartBooking.API.Services
                 var business = new Business
                 {
                     Name = user.Name + " Business",
-                    BusinessType = "Default", 
+                    BusinessType = "Default Category", 
                     OwnerName = user.Name,    
-                    Email = user.Email,       
-                    UserId = user.Id          
+                    Email = user.Email,
+                    Phone = "0000000000",       // Added Missing Field
+                    Address = "Default Address",// Added Missing Field
+                    City = "Default City",      // Added Missing Field
+                    OpeningTime = "09:00",      // Added Missing Field
+                    ClosingTime = "18:00",      // Added Missing Field
+                    UserId = user.Id         
                 };
 
                 _context.Businesses.Add(business);
