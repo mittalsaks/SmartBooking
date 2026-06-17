@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!icon\\.ico|logo\\.png).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/icon.ico",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ]
+}
