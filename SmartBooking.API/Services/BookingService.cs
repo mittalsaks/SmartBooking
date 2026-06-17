@@ -19,17 +19,20 @@ namespace SmartBooking.API.Services
         Task<IEnumerable<BookingResponseDto>> GetBookingsByOfferAsync(int offerId);
         Task<BookingResponseDto?> UpdateBookingStatusAsync(int bookingId, string status);
         Task<DashboardStatsDto> GetDashboardStatsAsync();
+        Task<DashboardStatsDto> GetDashboardStatsByUserAsync(int userId);
     }
 
     public class BookingService : IBookingService
     {
         private readonly AppDbContext _context;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IEmailService _emailService;
 
-        public BookingService(AppDbContext context, IBookingRepository bookingRepository)
+        public BookingService(AppDbContext context, IBookingRepository bookingRepository,IEmailService emailService)
         {
             _context = context;
             _bookingRepository = bookingRepository;
+            _emailService = emailService; 
         }
 
         public async Task<BookingResponseDto> BookSlotAsync(int? customerId, CreateBookingDto request)
@@ -75,6 +78,26 @@ namespace SmartBooking.API.Services
 
                 await _bookingRepository.AddAsync(booking);
                 await transaction.CommitAsync();
+                if (!string.IsNullOrWhiteSpace(booking.CustomerEmail))
+{
+    try
+    {
+        await _emailService.SendBookingConfirmationAsync(
+            toEmail: booking.CustomerEmail,
+            customerName: booking.CustomerName,
+            bookingReference: booking.BookingReference,
+            offerTitle: slot.Offer?.Title ?? "Your Offer",
+            businessName: slot.Offer?.Business?.Name ?? "Business",
+            slotDate: slot.SlotDate.ToString("ddd, dd MMM yyyy"),
+            slotTime: $"{slot.StartTime:hh\\:mm} – {slot.EndTime:hh\\:mm}"
+        );
+    }
+    catch (Exception emailEx)
+    {
+        // Email fail hone se booking cancel nahi hogi
+        Console.WriteLine($"[Email] Failed to send: {emailEx.Message}");
+    }
+}
 
                 return new BookingResponseDto
                 {
@@ -181,7 +204,34 @@ namespace SmartBooking.API.Services
                 RecentBookings = recentBookings
             };
         }
-
+        public async Task<DashboardStatsDto> GetDashboardStatsByUserAsync(int userId)
+{
+    var today = DateTime.UtcNow.Date;
+    var business = await _context.Businesses.AsNoTracking().FirstOrDefaultAsync(b => b.UserId == userId);
+    if (business == null) return new DashboardStatsDto();
+    var myOffers = await _context.Offers.Where(o => o.BusinessId == business.Id).ToListAsync();
+    var myOfferIds = myOffers.Select(o => o.Id).ToList();
+    var mySlots = await _context.OfferSlots.Where(s => myOfferIds.Contains(s.OfferId)).ToListAsync();
+    var mySlotIds = mySlots.Select(s => s.Id).ToList();
+    var myBookings = await _context.Bookings.Include(b => b.Slot).ThenInclude(s => s.Offer).Where(b => mySlotIds.Contains(b.SlotId)).OrderByDescending(b => b.BookedAt).ToListAsync();
+    var confirmedCount = myBookings.Count(b => b.Status == BookingStatus.Confirmed);
+    var conversionRate = myBookings.Count > 0 ? Math.Round((double)confirmedCount / myBookings.Count * 100, 1) : 0;
+    var recentBookings = myBookings.Take(5).Select(b => new RecentBookingDto
+    {
+        Id = b.Id, BookingReference = b.BookingReference, CustomerName = b.CustomerName,
+        CustomerEmail = b.CustomerEmail, OfferTitle = b.Slot?.Offer?.Title ?? "",
+        SlotTime = b.Slot != null ? $"{b.Slot.StartTime:hh\\:mm} - {b.Slot.EndTime:hh\\:mm}" : "",
+        PeopleCount = b.PeopleCount, Status = b.Status.ToString(), BookedAt = b.BookedAt
+    }).ToList();
+    return new DashboardStatsDto
+    {
+        TotalOffers = myOffers.Count, ActiveOffers = myOffers.Count(o => o.Status == "Active"),
+        TotalBookings = myBookings.Count, TodaysBookings = myBookings.Count(b => b.BookedAt.Date == today),
+        TotalCapacity = mySlots.Sum(s => s.Capacity), BookedSeats = mySlots.Sum(s => s.BookedCount),
+        AvailableSeats = mySlots.Sum(s => s.AvailableCount), ConversionRate = conversionRate,
+        RecentBookings = recentBookings
+    };
+}
         private BookingResponseDto MapToDto(Booking booking)
         {
             return new BookingResponseDto

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axiosClient from '../api/axiosClient';
-import { sendNotification } from '../services/notificationApi';
 import {
   ArrowLeft, User, Phone, Mail, Users, FileText,
   CheckCircle, Calendar, Clock, Building2, Zap,
@@ -162,10 +161,8 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
       style={{ maxWidth: 560, margin: '0 auto' }}
     >
       <div style={{ ...cardStyle }}>
-        {/* Top accent */}
         <div style={{ height: 3, background: `linear-gradient(90deg, ${T.green}, ${T.cyan})` }} />
 
-        {/* Hero */}
         <div style={{
           padding: '40px 32px 28px', textAlign: 'center',
           borderBottom: `1px solid ${T.border}`,
@@ -195,7 +192,6 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
             Your reservation has been successfully placed.
           </p>
 
-          {/* Reference number */}
           <div style={{
             marginTop: 20, padding: '14px 20px', borderRadius: 14,
             display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -214,16 +210,12 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
           </div>
         </div>
 
-        {/* Detail rows */}
         <div style={{ padding: '24px 32px' }}>
           {[
             { icon: FileText,    label: 'Offer',    value: booking.offerTitle },
             { icon: Building2,   label: 'Business', value: booking.businessName },
             { icon: Calendar,    label: 'Date',     value: formatDate(booking.slotDate) },
-            {
-              icon: Clock, label: 'Time',
-              value: `${formatTime(booking.slotStartTime)} – ${formatTime(booking.slotEndTime)}`,
-            },
+            { icon: Clock,       label: 'Time',     value: `${formatTime(booking.slotStartTime)} – ${formatTime(booking.slotEndTime)}` },
             { icon: User,        label: 'Customer', value: booking.customerName },
             { icon: Users,       label: 'People',   value: String(booking.peopleCount) },
             { icon: CheckCircle, label: 'Status',   value: booking.status, highlight: true },
@@ -242,16 +234,12 @@ function ConfirmationPage({ booking, onBack }: { booking: BookingResult; onBack:
                   background: T.greenDim, border: `1px solid ${T.greenBorder}`, color: T.green,
                 }}>{value}</span>
               ) : (
-                <span style={{
-                  fontSize: 13, color: T.text, fontWeight: 600,
-                  textAlign: 'right', maxWidth: '58%',
-                }}>{value}</span>
+                <span style={{ fontSize: 13, color: T.text, fontWeight: 600, textAlign: 'right', maxWidth: '58%' }}>{value}</span>
               )}
             </div>
           ))}
         </div>
 
-        {/* Footer */}
         <div style={{ padding: '0 32px 28px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{
             padding: '12px 16px', borderRadius: 12, textAlign: 'center',
@@ -307,29 +295,27 @@ export default function BookingConfirm() {
     if (!slotId) return;
     (async () => {
       try {
-        /* Step 1: fetch the slot directly */
         const slotRes = await axiosClient.get(`/slots/${slotId}`);
         const s = slotRes.data;
 
-        /* Step 2: fetch the parent offer for pricing + business info */
         let offerData: any = {};
         try {
           const offerRes = await axiosClient.get(`/offers/${s.offerId}`);
           offerData = offerRes.data;
-        } catch { /* offer info is enrichment only — fail gracefully */ }
+        } catch { /* enrichment only */ }
 
         setSlot({
           id:                    s.id,
           offerId:               s.offerId,
-          offerTitle:            offerData.title             ?? s.offerTitle        ?? 'Offer',
-          businessName:          offerData.businessName      ?? s.businessName      ?? '',
+          offerTitle:            offerData.title                 ?? s.offerTitle        ?? 'Offer',
+          businessName:          offerData.businessName          ?? s.businessName      ?? '',
           slotDate:              s.slotDate,
           startTime:             s.startTime,
           endTime:               s.endTime,
-          availableCount:        s.availableCount            ?? s.available         ?? 0,
+          availableCount:        s.availableCount                ?? s.available         ?? 0,
           capacity:              s.capacity,
-          offerPrice:            offerData.offerPrice        ?? s.offerPrice        ?? 0,
-          originalPrice:         offerData.originalPrice     ?? s.originalPrice     ?? 0,
+          offerPrice:            offerData.offerPrice            ?? s.offerPrice        ?? 0,
+          originalPrice:         offerData.originalPrice         ?? s.originalPrice     ?? 0,
           maxBookingPerCustomer: offerData.maxBookingPerCustomer ?? 5,
         });
       } catch {
@@ -366,6 +352,7 @@ export default function BookingConfirm() {
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setSubmitting(true);
+
     try {
       const payload: Record<string, any> = {
         slotId:        Number(slotId),
@@ -374,67 +361,21 @@ export default function BookingConfirm() {
         customerPhone: form.customerPhone.trim(),
         peopleCount:   form.peopleCount,
       };
+
       if (form.customerEmail.trim()) payload.customerEmail = form.customerEmail.trim();
       if (form.specialNote.trim())   payload.specialNote   = form.specialNote.trim();
 
+      console.log('📤 Payload:', payload); // debug — browser console mein dekho
+
       const res = await axiosClient.post('/bookings', payload);
-      const handleSubmit = async () => {
-  const errs = validate();
-  if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-  setErrors({});
-  setSubmitting(true);
-  try {
-    const payload: Record<string, any> = {
-      slotId:        Number(slotId),
-      offerId:       slot?.offerId ?? 0,
-      customerName:  form.customerName.trim(),
-      customerPhone: form.customerPhone.trim(),
-      peopleCount:   form.peopleCount,
-    };
-    if (form.customerEmail.trim()) payload.customerEmail = form.customerEmail.trim();
-    if (form.specialNote.trim())   payload.specialNote   = form.specialNote.trim();
-
-    const res = await axiosClient.post('/bookings', payload);
-
-    // ✅ WhatsApp notification — fire and forget (booking cancel nahi hogi agar fail ho)
-    sendNotification({
-      userId:  0,           // guest booking hai toh 0, agar userId available ho toh woh do
-      type:    'booking_confirmation',
-      channel: 'email',
-      data: {
-        customerName:  form.customerName.trim(),
-        customerEmail: form.customerEmail.trim(),
-        bookingRef:    res.data.bookingReference || res.data.referenceNumber || `#${res.data.id}`,
-        offerTitle:    slot?.offerTitle    ?? '',
-        businessName:  slot?.businessName  ?? '',
-        slotDate:      slot?.slotDate      ?? '',
-        startTime:     slot?.startTime     ?? '',
-        endTime:       slot?.endTime       ?? '',
-        peopleCount:   form.peopleCount,
-        offerPrice:    slot?.offerPrice    ?? 0,
-      },
-    }).catch(err => console.warn('[WhatsApp] Notification failed silently:', err));
-
-    setConfirmed(res.data);
-  } catch (err: any) {
-    const raw = err?.response?.data;
-    const msg =
-      typeof raw === 'string' ? raw :
-      raw?.message            ? raw.message :
-      raw?.error              ? raw.error :
-      'Booking failed. Please try again.';
-    setErrors({ general: msg });
-  } finally {
-    setSubmitting(false);
-  }
-};
       setConfirmed(res.data);
+
     } catch (err: any) {
       const raw = err?.response?.data;
       const msg =
-        typeof raw === 'string'   ? raw :
-        raw?.message              ? raw.message :
-        raw?.error                ? raw.error :
+        typeof raw === 'string' ? raw :
+        raw?.message            ? raw.message :
+        raw?.error              ? raw.error :
         'Booking failed. Please try again.';
       setErrors({ general: msg });
     } finally {
@@ -496,7 +437,6 @@ export default function BookingConfirm() {
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', position: 'relative' }}>
 
-      {/* Ambient glow */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
         background: 'radial-gradient(ellipse 80% 40% at 50% -5%, rgba(57,255,150,0.04) 0%, transparent 70%)',
@@ -504,7 +444,6 @@ export default function BookingConfirm() {
 
       <div style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* Back button */}
         <motion.button
           initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -3 }}
@@ -521,9 +460,7 @@ export default function BookingConfirm() {
           <ArrowLeft size={15} /> Back to Offer
         </motion.button>
 
-        {/* Title */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-          style={{ marginBottom: 28 }}>
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
           <p style={{
             fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
             textTransform: 'uppercase', color: 'rgba(57,255,150,0.6)', marginBottom: 6,
@@ -539,7 +476,7 @@ export default function BookingConfirm() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start' }}>
 
-          {/* ══ FORM (left) ══ */}
+          {/* ══ FORM ══ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -555,7 +492,6 @@ export default function BookingConfirm() {
                 </p>
               </div>
 
-              {/* General error */}
               <AnimatePresence>
                 {errors.general && (
                   <motion.div
@@ -572,7 +508,6 @@ export default function BookingConfirm() {
                 )}
               </AnimatePresence>
 
-              {/* Customer Name */}
               <Field label="Customer Name" icon={User} required error={errors.customerName}>
                 <input
                   type="text" value={form.customerName}
@@ -583,7 +518,6 @@ export default function BookingConfirm() {
                 />
               </Field>
 
-              {/* Phone */}
               <Field label="Phone Number" icon={Phone} required error={errors.customerPhone}>
                 <input
                   type="tel" value={form.customerPhone}
@@ -594,7 +528,6 @@ export default function BookingConfirm() {
                 />
               </Field>
 
-              {/* Email */}
               <Field label="Email Address" icon={Mail} error={errors.customerEmail}>
                 <input
                   type="email" value={form.customerEmail}
@@ -605,7 +538,6 @@ export default function BookingConfirm() {
                 />
               </Field>
 
-              {/* People */}
               <Field label="Number of People" icon={Users} required error={errors.peopleCount}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <input
@@ -621,7 +553,6 @@ export default function BookingConfirm() {
                 </div>
               </Field>
 
-              {/* Special Note */}
               <Field label="Special Note" icon={FileText}>
                 <textarea
                   value={form.specialNote}
@@ -629,28 +560,16 @@ export default function BookingConfirm() {
                   placeholder="Any special requests… (optional)"
                   rows={3}
                   onFocus={() => setFocused('note')} onBlur={() => setFocused(null)}
-                  style={{
-                    ...inputStyle(focused === 'note', false),
-                    resize: 'vertical', minHeight: 80, lineHeight: 1.6,
-                  }}
+                  style={{ ...inputStyle(focused === 'note', false), resize: 'vertical', minHeight: 80, lineHeight: 1.6 }}
                 />
               </Field>
 
-              {/* Selected slot summary */}
-              <div style={{
-                padding: '14px 16px', borderRadius: 14,
-                background: T.greenDim, border: `1px solid ${T.greenBorder}`,
-              }}>
-                <p style={{
-                  fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-                  letterSpacing: '0.1em', color: 'rgba(57,255,150,0.6)', margin: '0 0 10px',
-                }}>Selected Slot</p>
+              <div style={{ padding: '14px 16px', borderRadius: 14, background: T.greenDim, border: `1px solid ${T.greenBorder}` }}>
+                <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(57,255,150,0.6)', margin: '0 0 10px' }}>Selected Slot</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Calendar size={13} color={T.green} />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: T.text }}>
-                      {slot ? formatDate(slot.slotDate) : '—'}
-                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: T.text }}>{slot ? formatDate(slot.slotDate) : '—'}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Clock size={13} color={T.textMuted} />
@@ -661,7 +580,6 @@ export default function BookingConfirm() {
                 </div>
               </div>
 
-              {/* Submit */}
               <motion.button
                 onClick={handleSubmit}
                 disabled={submitting}
@@ -669,9 +587,7 @@ export default function BookingConfirm() {
                 whileTap={!submitting ? { scale: 0.98 } : {}}
                 style={{
                   width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-                  background: submitting
-                    ? 'rgba(57,255,150,0.3)'
-                    : 'linear-gradient(135deg,#39FF96,#22C55E)',
+                  background: submitting ? 'rgba(57,255,150,0.3)' : 'linear-gradient(135deg,#39FF96,#22C55E)',
                   color: '#050D18', fontSize: 15, fontWeight: 800,
                   cursor: submitting ? 'not-allowed' : 'pointer',
                   fontFamily: 'inherit', transition: 'all 0.2s',
@@ -687,7 +603,7 @@ export default function BookingConfirm() {
             </div>
           </motion.div>
 
-          {/* ══ SUMMARY (right) ══ */}
+          {/* ══ SUMMARY ══ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
@@ -696,11 +612,8 @@ export default function BookingConfirm() {
             <div style={{ ...cardStyle }}>
               <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${T.cyan}, transparent)`, opacity: 0.5 }} />
               <div style={{ padding: '20px 22px' }}>
-                <h2 style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 16px' }}>
-                  Booking Summary
-                </h2>
+                <h2 style={{ fontSize: 13, fontWeight: 700, color: T.text, margin: '0 0 16px' }}>Booking Summary</h2>
 
-                {/* Offer name + business */}
                 <div style={{ marginBottom: 16 }}>
                   <p style={{ fontSize: 15, fontWeight: 800, color: T.text, margin: '0 0 3px', lineHeight: 1.3 }}>
                     {slot?.offerTitle ?? '—'}
@@ -710,7 +623,6 @@ export default function BookingConfirm() {
                   </p>
                 </div>
 
-                {/* Slot info */}
                 <div style={{
                   padding: '12px 14px', borderRadius: 12, marginBottom: 16,
                   background: 'rgba(255,255,255,0.03)', border: `1px solid ${T.border}`,
@@ -719,9 +631,7 @@ export default function BookingConfirm() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Calendar size={12} color={T.textMuted} />
                     <span style={{ fontSize: 12, color: T.textSec, fontWeight: 600 }}>
-                      {slot
-                        ? new Date(slot.slotDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-                        : '—'}
+                      {slot ? new Date(slot.slotDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '—'}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -738,7 +648,6 @@ export default function BookingConfirm() {
                   </div>
                 </div>
 
-                {/* Pricing */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[
                     { label: 'Offer Price',    val: slot ? `₹${slot.offerPrice.toFixed(2)}` : '—',    color: T.text },
@@ -763,7 +672,6 @@ export default function BookingConfirm() {
                   )}
                 </div>
 
-                {/* People total */}
                 {slot && form.peopleCount > 1 && (
                   <div style={{
                     marginTop: 12, padding: '10px 14px', borderRadius: 12, fontSize: 12,

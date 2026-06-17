@@ -114,3 +114,8 @@ F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\Smart
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\ref\SmartBooking.API.dll
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\SmartBooking.API.staticwebassets.runtime.json
 F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\obj\Debug\net8.0\SmartBooking.API.sourcelink.json
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\MailKit.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\MimeKit.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+F:\FULLSTACK\Hackathons\BusinnessProblem\SmartBooking.API\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
