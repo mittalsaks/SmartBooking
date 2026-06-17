@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartBooking.API.DTOs;
 using SmartBooking.API.Services;
-
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 namespace SmartBooking.API.Controllers
 {
     [Route("api/[controller]")]
@@ -28,7 +29,20 @@ namespace SmartBooking.API.Controllers
             var offers = await _offerService.GetAllOffersAsync();
             return Ok(offers);
         }
+        // GET: api/offers/my-offers
+[HttpGet("my-offers")]
+[Authorize]
+public async Task<IActionResult> GetMyOffers()
+{
+    var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                       ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+    if (!int.TryParse(userIdClaim, out int userId))
+        return Unauthorized();
+
+    var offers = await _offerService.GetOffersByUserIdAsync(userId);
+    return Ok(offers);
+}
         // GET: api/offers/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

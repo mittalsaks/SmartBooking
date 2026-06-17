@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using SmartBooking.API.DTOs;
 using SmartBooking.API.Interfaces;
 using SmartBooking.API.Models;
-
+using Microsoft.EntityFrameworkCore;
+using SmartBooking.API.Data;
 namespace SmartBooking.API.Services
 {
     public interface IOfferService
     {
         Task<IEnumerable<OfferResponseDto>> GetAllOffersAsync();
+        Task<IEnumerable<OfferResponseDto>> GetOffersByUserIdAsync(int userId);
         Task<OfferResponseDto?> GetOfferByIdAsync(int id);
         Task<OfferResponseDto> CreateOfferAsync(CreateOfferDto request);
         Task<bool> UpdateOfferAsync(int id, UpdateOfferDto request);
@@ -20,10 +22,12 @@ namespace SmartBooking.API.Services
     public class OfferService : IOfferService
     {
         private readonly IOfferRepository _repository;
+        private readonly AppDbContext _context;
 
-        public OfferService(IOfferRepository repository)
+        public OfferService(IOfferRepository repository, AppDbContext context)
         {
             _repository = repository;
+             _context = context;
         }
 
         public async Task<IEnumerable<OfferResponseDto>> GetAllOffersAsync()
@@ -33,7 +37,22 @@ namespace SmartBooking.API.Services
             // .Where(o => o.BusinessId == businessId)  // ✅ Filter
             //     .Select(MapToResponseDto);
         }
+        public async Task<IEnumerable<OfferResponseDto>> GetOffersByUserIdAsync(int userId)
+{
+    var business = await _context.Businesses
+        .FirstOrDefaultAsync(b => b.UserId == userId);
 
+    if (business == null)
+        return new List<OfferResponseDto>();
+
+    var offers = await _context.Offers
+        .Include(o => o.Business)
+        .Include(o => o.Slots)
+        .Where(o => o.BusinessId == business.Id)
+        .ToListAsync();
+
+    return offers.Select(MapToResponseDto);
+}
         public async Task<OfferResponseDto?> GetOfferByIdAsync(int id)
         {
             var offer = await _repository.GetByIdAsync(id);
