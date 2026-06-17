@@ -32,7 +32,30 @@ namespace SmartBooking.API.Controllers
             var offers = await _offerService.GetAllOffersAsync();
             return Ok(offers);
         }
+        [HttpGet("my-offers")]
+[Authorize]
+public async Task<IActionResult> GetMyOffers()
+{
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                   ?? User.FindFirst(JwtRegisteredClaimNames.Sub)
+                   ?? User.FindFirst("sub");
 
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+        return Unauthorized("User identity could not be resolved from token.");
+
+    var business = await _context.Businesses
+        .AsNoTracking()
+        .FirstOrDefaultAsync(b => b.UserId == userId);
+
+    if (business == null)
+        return BadRequest("No business profile found.");
+
+    var offers = await _context.Offers
+        .Where(o => o.BusinessId == business.Id)
+        .ToListAsync();
+
+    return Ok(offers);
+}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {

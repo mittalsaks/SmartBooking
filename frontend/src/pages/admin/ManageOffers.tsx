@@ -669,7 +669,7 @@ export default function ManageOffers() {
   const fetchOffers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axiosClient.get('/offers');
+      const res = await axiosClient.get('/offers/my-offers');
       setOffers(res.data);
     } catch (err) { console.error('Failed to fetch offers', err); }
     finally { setLoading(false); }
