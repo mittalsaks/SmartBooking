@@ -22,16 +22,7 @@ namespace SmartBooking.API.Models
         public decimal OfferPrice { get; set; }
 
         [Column(TypeName = "decimal(5,2)")]
-        // Purani line hata kar ye daalo:
-        private decimal _discountPercentage;
-
-        [Column(TypeName = "decimal(5,2)")]
-        public decimal DiscountPercentage
-        {
-            get => _discountPercentage;
-            // Agar value minus (-) mein aayi, toh usko 0 kar dega, warna normal save karega
-            set => _discountPercentage = value < 0 ? 0 : value; 
-        }
+        public decimal DiscountPercentage { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

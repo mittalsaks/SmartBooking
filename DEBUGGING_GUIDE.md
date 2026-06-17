@@ -34,8 +34,8 @@ dotnet run
 4. Look for these logs:
    ```
    📡 Fetching offers from API...
-   API Base URL: https://smartbooking-pmww.onrender.com/api
-   Full Request URL: https://smartbooking-pmww.onrender.com/api/offers
+   API Base URL: http://localhost:5237/api
+   Full Request URL: http://localhost:5237/api/offers
    ✅ API Response Status: 200
    📦 Full API Response: [...]
    📊 Offers Count: X
@@ -77,19 +77,19 @@ dotnet ef dbcontext info
 2. Add this request:
    ```http
    ### Get All Active Offers
-   GET https://smartbooking-pmww.onrender.com/api/offers
+   GET http://localhost:5237/api/offers
    ```
 3. Click "Send Request"
 4. Check the response
 
 **Option B: Using cURL**
 ```bash
-curl https://smartbooking-pmww.onrender.com/api/offers
+curl http://localhost:5237/api/offers
 ```
 
 **Option C: Using Postman**
 1. Create new GET request
-2. URL: `https://smartbooking-pmww.onrender.com/api/offers`
+2. URL: `http://localhost:5237/api/offers`
 3. Click "Send"
 
 ---
@@ -100,7 +100,7 @@ curl https://smartbooking-pmww.onrender.com/api/offers
 **Cause**: Backend not running or port mismatch  
 **Solution**:
 1. Verify backend runs on port **5237** (check `appsettings.json`)
-2. Check `axiosClient.ts` has correct baseURL: `https://smartbooking-pmww.onrender.com/api`
+2. Check `axiosClient.ts` has correct baseURL: `http://localhost:5237/api`
 3. Ensure backend is running: `dotnet run`
 
 ### ❌ Issue: "Response is not an array"

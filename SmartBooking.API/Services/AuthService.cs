@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +13,7 @@ namespace SmartBooking.API.Services
     {
         Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request);
         Task<AuthResponseDto> LoginAsync(LoginRequestDto request);
+        Task<bool> ForgotPasswordAsync(string email);
     }
 
     public class AuthService : IAuthService
@@ -31,46 +32,19 @@ namespace SmartBooking.API.Services
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                 return new AuthResponseDto { IsSuccess = false, Message = "Email already exists." };
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var user = new User
             {
-                var user = new User
-                {
-                    Name = request.Name,
-                    Email = request.Email,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                    Role = request.Role
-                };
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                Name = request.Name,
+                Email = request.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Phone = request.Phone,
+                Role = request.Role
+            };
 
-                var business = new Business
-                {
-                    Name = user.Name + "'s Business",
-                    BusinessType = "General",
-                    OwnerName = user.Name,
-                    Email = user.Email,
-                    Phone = "0000000000",
-                    Address = "Not provided",
-                    City = "Not provided",
-                    OpeningTime = "09:00",
-                    ClosingTime = "18:00",
-                    UserId = user.Id
-                };
-                _context.Businesses.Add(business);
-                await _context.SaveChangesAsync();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-                await transaction.CommitAsync();
-
-                var token = GenerateJwtToken(user, business.Id);
-                return new AuthResponseDto { IsSuccess = true, Token = token, Role = user.Role, Message = "Registration successful." };
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                var exactError = ex.InnerException?.Message ?? ex.Message;
-                return new AuthResponseDto { IsSuccess = false, Message = "Registration failed: " + exactError };
-            }
+            return new AuthResponseDto { IsSuccess = true, Message = "User registered successfully." };
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
@@ -79,35 +53,42 @@ namespace SmartBooking.API.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return new AuthResponseDto { IsSuccess = false, Message = "Invalid credentials." };
 
-            var business = await _context.Businesses.AsNoTracking().FirstOrDefaultAsync(b => b.UserId == user.Id);
-            var token = GenerateJwtToken(user, business?.Id);
-            return new AuthResponseDto { IsSuccess = true, Token = token, Role = user.Role, Message = "Login successful." };
+            // ✅ Fixed: removed duplicate Token, removed _jwtService (doesn't exist),
+            //           use local GenerateJwtToken(), and set IsSuccess = true
+            var token = GenerateJwtToken(user);
+            return new AuthResponseDto
+            {
+                IsSuccess = true,
+                Token = token,
+                Message = "Login successful."
+            };
         }
 
-        private string GenerateJwtToken(User user, int? businessId)
+        public async Task<bool> ForgotPasswordAsync(string email)
         {
-            var key = _config["JwtSettings:Key"] ?? throw new InvalidOperationException("JWT Key is not configured.");
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var found = await _context.Users.AnyAsync(u => u.Email == email);
+            Console.WriteLine($"Password reset requested for: {email}");
+            return found;
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new List<Claim>
+            var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
-
-            if (businessId.HasValue)
-                claims.Add(new Claim("businessId", businessId.Value.ToString()));
 
             var token = new JwtSecurityToken(
                 issuer: _config["JwtSettings:Issuer"],
                 audience: _config["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: DateTime.Now.AddHours(2),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -108,21 +108,7 @@ namespace SmartBooking.API.Controllers
             catch (ArgumentException ex) { return BadRequest(new { message = ex.Message }); }
             catch (Exception ex) { return StatusCode(500, new { message = $"Failed: {ex.Message}" }); }
         }
-        // GET /api/bookings/my-dashboard-stats
-        [HttpGet("my-dashboard-stats")]
-        [Authorize]
-        public async Task<IActionResult> GetMyDashboardStats()
-        {
-            try
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
-                    return Unauthorized("User identity could not be resolved.");
-                var stats = await _bookingService.GetDashboardStatsByUserAsync(userId);
-                return Ok(stats);
-            }
-            catch (Exception ex) { return StatusCode(500, new { message = $"Failed: {ex.Message}" }); }
-        }
+
         // GET /api/bookings/dashboard-stats
         [HttpGet("dashboard-stats")]
         [Authorize]
@@ -130,12 +116,8 @@ namespace SmartBooking.API.Controllers
         {
             try
             {
-               var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
-                    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
-                        return Unauthorized("User identity could not be resolved.");
-
-                    var stats = await _bookingService.GetDashboardStatsByUserAsync(userId);
-                    return Ok(stats);
+                var stats = await _bookingService.GetDashboardStatsAsync();
+                return Ok(stats);
             }
             catch (Exception ex) { return StatusCode(500, new { message = $"Failed: {ex.Message}" }); }
         }
