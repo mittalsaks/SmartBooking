@@ -31,43 +31,51 @@ namespace SmartBooking.API.Services
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                 return new AuthResponseDto { IsSuccess = false, Message = "Email already exists." };
 
-            var user = new User
-            {
-                Name = request.Name,
-                Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = request.Role
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync(); 
-
-            // Business creation with proper mapping
+            // 🛑 STRICT FIX: TRANSACTION START (Agar ek fail, toh sab fail)
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                var user = new User
+                {
+                    Name = request.Name,
+                    Email = request.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Role = request.Role
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
                 var business = new Business
                 {
                     Name = user.Name + " Business",
-                    BusinessType = "Default Category", 
-                    OwnerName = user.Name,    
+                    BusinessType = "Default",
+                    OwnerName = user.Name,
                     Email = user.Email,
-                    Phone = "0000000000",       // Added Missing Field
-                    Address = "Default Address",// Added Missing Field
-                    City = "Default City",      // Added Missing Field
-                    OpeningTime = "09:00",      // Added Missing Field
-                    ClosingTime = "18:00",      // Added Missing Field
-                    UserId = user.Id         
+                    Phone = "1234567890",
+                    Address = "Default Address",
+                    City = "Default City",
+                    OpeningTime = "09:00",
+                    ClosingTime = "18:00",
+                    UserId = user.Id
                 };
 
                 _context.Businesses.Add(business);
                 await _context.SaveChangesAsync();
+
+                // Sab theek raha toh DB mein permanently save kar do
+                await transaction.CommitAsync(); 
+                return new AuthResponseDto { IsSuccess = true, Message = "User and Business registered successfully!" };
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Business creation failed/skipped: " + ex.Message);
+                // Agar DB ne Business reject kiya, toh User ko bhi Rollback (Delete) kar do
+                await transaction.RollbackAsync(); 
+                
+                // 🚨 ASLI BIMARI KO PAKAD KAR FRONTEND PAR BHEJO
+                var exactError = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return new AuthResponseDto { IsSuccess = false, Message = "Database Error: " + exactError };
             }
-
-            return new AuthResponseDto { IsSuccess = true, Message = "User and Business registered successfully." };
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
