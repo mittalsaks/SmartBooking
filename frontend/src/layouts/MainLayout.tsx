@@ -236,7 +236,7 @@ export default function MainLayout() {
         {/* ── Navbar ── */}
         <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
           <Link to="/" className="nav-logo">
-            <img src="/logo.jpg" alt="SmartBooking" className="h-8 w-auto" />
+            <img src="/logo.png" alt="SmartBooking" className="h-8 w-auto" />
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

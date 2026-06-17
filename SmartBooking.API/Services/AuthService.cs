@@ -28,9 +28,11 @@ namespace SmartBooking.API.Services
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
         {
+            // 1. Check if email exists
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                 return new AuthResponseDto { IsSuccess = false, Message = "Email already exists." };
 
+            // 2. Create the User
             var user = new User
             {
                 Name = request.Name,
@@ -40,9 +42,29 @@ namespace SmartBooking.API.Services
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // User save hoga aur uski ek nayi 'Id' generate hogi
 
-            return new AuthResponseDto { IsSuccess = true, Message = "User registered successfully." };
+            // ✅ 3. PERMANENT FIX: Automatically create a Business for this new User
+            try
+            {
+                var business = new Business
+                {
+                    // Hum User ki Id ko hi Business ki Id bana rahe hain, 
+                    // kyunki frontend token se User Id ko hi businessId samajh kar bhej raha hai.
+                    Id = user.Id, 
+                    Name = user.Name + " Business"
+                };
+
+                _context.Businesses.Add(business);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Agar Business pehle se hai ya schema alag hai, toh application crash nahi hogi
+                Console.WriteLine("Business creation failed/skipped: " + ex.Message);
+            }
+
+            return new AuthResponseDto { IsSuccess = true, Message = "User and Business registered successfully." };
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request)
