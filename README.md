@@ -34,14 +34,26 @@ SmartBooking is an enterprise-grade, full-stack scheduling ecosystem and real-ti
 
 ---
 
-## 🏗️ Technical Architecture & Ecosystem
+---
 
-```text
-[ React 19 Frontend Client ] 
-       │ (Secured Axios TLS Requests & Local JWT Validation)
-       ▼
-[ ASP.NET Core 8 Web API Gateway ]
-       │
-       ├─► [ PostgreSQL Relational Cluster ] ———► (Persistent App Data)
-       ├─► [ Cloudinary Image Content CDN ] ———► (Permanent Asset Storage)
-       └─► [ Google SMTP Mail Server Engine ] ──► (Instant Automated Notifications)
+## 🛠️ Tech Stack Architecture
+- **Backend Infrastructure:** ASP.NET Core 8 & PostgreSQL (Robust & Reliable Data Storage).
+- **Frontend Interface:** React 19 + TypeScript + Tailwind CSS (Highly responsive UI).
+- **Media Pipeline:** Cloudinary Integration (Persistent, cloud-based Image Hosting).
+- **Notification Engine:** Gmail SMTP Integration (Automated Transactional Emails).
+- **Interactive UX:** Framer Motion for buttery-smooth animations and state feedback.
+
+---
+
+## 🔐 Local Setup & Installation
+1. **Clone the repository:** `git clone https://github.com/mittalsaks/SmartBooking.git`
+2. **Environment Setup:** Add your `Cloudinary`, `JWT`, and `SMTP` credentials in your backend configuration (or Render Environment Variables).
+3. **Run the Services:** - Backend: `dotnet run` 
+   - Frontend: `npm run dev`
+
+---
+
+## 👨‍💻 Developed By
+**Sakshi Mittal** | [GitHub: @mittalsaks](https://github.com/mittalsaks)
+
+*Built with ❤️ for the Hackathon. Focused on clean architecture and scalable solutions.*
