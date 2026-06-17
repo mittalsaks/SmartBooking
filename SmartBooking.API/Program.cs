@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +10,6 @@ using SmartBooking.API.Repositories;
 using SmartBooking.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -19,11 +18,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173","https://smart-booking-git-main-mittalsaks-projects.vercel.app",
-            "https://smart-booking-dun-pi.vercel.app")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-              .AllowCredentials();
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "https://smart-booking-git-main-mittalsaks-projects.vercel.app",
+            "https://smart-booking-dun-pi.vercel.app"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
@@ -87,13 +89,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-//app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// ✅ Seed slots in development
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
