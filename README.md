@@ -1,7 +1,7 @@
 # 🚀 SmartBooking - Notification Service Platform
 
 <div align="center">
-  <img src="./frontend/public/logo.png" alt="SmartBooking Logo" width="250"/>
+  <img src="./frontend/public/logo.png" alt="SmartBooking Logo" width="400"/>
 </div>
 
 <br/>
