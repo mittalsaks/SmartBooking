@@ -16,7 +16,7 @@ A modern, full-stack booking and real-time notification management system design
 
 ## 📸 Project Showcase & Key Features
 
-### 1. 📊 Admin Dashboard
+### 1. 📊 Dashboard
 ![Admin Dashboard](./images/frontend%20images/Dashboard%20(2).png)
 **Real-time Business Insights:** The central command center for business owners. It provides live tracking of total bookings, generated revenue, and active offers. The modern dark-theme with glassmorphism UI ensures metrics are easy to read and visually engaging.
 
