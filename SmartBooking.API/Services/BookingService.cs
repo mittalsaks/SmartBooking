@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SmartBooking.API.Data;
 using SmartBooking.API.DTOs;
@@ -13,7 +15,7 @@ namespace SmartBooking.API.Services
 {
     public interface IBookingService
     {
-        Task<BookingResponseDto> BookSlotAsync(int? customerId, CreateBookingDto request); // ✅ nullable
+        Task<BookingResponseDto> BookSlotAsync(int? customerId, CreateBookingDto request);
         Task<IEnumerable<BookingResponseDto>> GetAllBookingsAsync();
         Task<BookingResponseDto?> GetBookingByIdAsync(int id);
         Task<IEnumerable<BookingResponseDto>> GetBookingsByOfferAsync(int offerId);
@@ -25,11 +27,16 @@ namespace SmartBooking.API.Services
     {
         private readonly AppDbContext _context;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor; // ✅ ADDED
 
-        public BookingService(AppDbContext context, IBookingRepository bookingRepository)
+        public BookingService(
+            AppDbContext context,
+            IBookingRepository bookingRepository,
+            IHttpContextAccessor httpContextAccessor) // ✅ ADDED
         {
             _context = context;
             _bookingRepository = bookingRepository;
+            _httpContextAccessor = httpContextAccessor; // ✅ ADDED
         }
 
         public async Task<BookingResponseDto> BookSlotAsync(int? customerId, CreateBookingDto request)
@@ -51,7 +58,6 @@ namespace SmartBooking.API.Services
                 if (slot.AvailableCount < request.PeopleCount)
                     throw new ArgumentException($"Only {slot.AvailableCount} seats available.");
 
-                // ✅ Auto-resolve OfferId from slot if frontend didn't send it
                 var offerId = request.OfferId > 0 ? request.OfferId : slot.OfferId;
 
                 slot.AvailableCount -= request.PeopleCount;
@@ -61,7 +67,6 @@ namespace SmartBooking.API.Services
 
                 var booking = new Booking
                 {
-                    // ✅ null for guests, actual ID for logged-in admin
                     CustomerId    = customerId > 0 ? customerId : null,
                     SlotId        = request.SlotId,
                     OfferId       = offerId,
@@ -107,7 +112,17 @@ namespace SmartBooking.API.Services
 
         public async Task<IEnumerable<BookingResponseDto>> GetAllBookingsAsync()
         {
+            // ✅ Filter bookings by logged-in user's business
+            var userId = GetCurrentUserId();
+            var business = await _context.Businesses.FirstOrDefaultAsync(b => b.UserId == userId);
+
             var bookings = await _bookingRepository.GetAllAsync();
+
+            if (business != null)
+            {
+                bookings = bookings.Where(b => b.Offer?.BusinessId == business.Id);
+            }
+
             return bookings.Select(MapToDto);
         }
 
@@ -140,9 +155,28 @@ namespace SmartBooking.API.Services
         public async Task<DashboardStatsDto> GetDashboardStatsAsync()
         {
             var today = DateTime.UtcNow.Date;
-            var allOffers = await _context.Offers.ToListAsync();
-            var allBookings = (await _bookingRepository.GetAllAsync()).ToList();
-            var allSlots = await _context.OfferSlots.ToListAsync();
+
+            // ✅ Get logged-in user's business
+            var userId = GetCurrentUserId();
+            var business = await _context.Businesses.FirstOrDefaultAsync(b => b.UserId == userId);
+            var businessId = business?.Id ?? 0;
+
+            // ✅ Filter offers by this business only
+            var allOffers = await _context.Offers
+                .Where(o => o.BusinessId == businessId)
+                .ToListAsync();
+
+            var offerIds = allOffers.Select(o => o.Id).ToList();
+
+            // ✅ Filter bookings by this business's offers only
+            var allBookings = (await _bookingRepository.GetAllAsync())
+                .Where(b => offerIds.Contains(b.OfferId))
+                .ToList();
+
+            // ✅ Filter slots by this business's offers only
+            var allSlots = await _context.OfferSlots
+                .Where(s => offerIds.Contains(s.OfferId))
+                .ToListAsync();
 
             var confirmedCount = allBookings.Count(b => b.Status == BookingStatus.Confirmed);
             var conversionRate = allBookings.Count > 0
@@ -180,6 +214,13 @@ namespace SmartBooking.API.Services
                 ConversionRate = conversionRate,
                 RecentBookings = recentBookings
             };
+        }
+
+        // ✅ Helper: get current logged-in user's ID from JWT
+        private int GetCurrentUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(claim, out int id) ? id : 0;
         }
 
         private BookingResponseDto MapToDto(Booking booking)
