@@ -1,4 +1,6 @@
 ﻿using System;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Security.Claims;
@@ -19,11 +21,12 @@ namespace SmartBooking.API.Controllers
     {
         private readonly IOfferService _offerService;
         private readonly AppDbContext _context;
-
+        private readonly IConfiguration _configuration;
         public OffersController(IOfferService offerService, AppDbContext context)
         {
             _offerService = offerService;
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -158,13 +161,31 @@ public async Task<IActionResult> GetMyOffers()
 
         private async Task<string> SaveOfferImageAsync(IFormFile imageFile)
         {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "offers");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-            var filePath = Path.Combine(uploadsFolder, fileName);
-            await using var stream = new FileStream(filePath, FileMode.Create);
-            await imageFile.CopyToAsync(stream);
-            return $"/uploads/offers/{fileName}";
+            // Ab yeh securely appsettings ya Render se aayega
+            var account = new Account(
+                _configuration["CloudinarySettings:CloudName"],
+                _configuration["CloudinarySettings:ApiKey"],
+                _configuration["CloudinarySettings:ApiSecret"]
+            );
+
+            var cloudinary = new Cloudinary(account);
+            cloudinary.Api.Secure = true;
+
+            using var stream = imageFile.OpenReadStream();
+            var uploadParams = new ImageUploadParams()
+            {
+                File = new FileDescription(imageFile.FileName, stream),
+                Folder = "SmartBooking_Offers"
+            };
+
+            var uploadResult = await cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error != null)
+            {
+                throw new Exception("Image upload failed: " + uploadResult.Error.Message);
+            }
+
+            return uploadResult.SecureUrl.ToString();
         }
     }
 }
