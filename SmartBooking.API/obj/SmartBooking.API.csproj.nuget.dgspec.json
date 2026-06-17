@@ -47,10 +47,6 @@
               "target": "Package",
               "version": "[4.2.0, )"
             },
-            "CloudinaryDotNet": {
-              "target": "Package",
-              "version": "[1.29.2, )"
-            },
             "MailKit": {
               "target": "Package",
               "version": "[4.17.0, )"
@@ -74,6 +70,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.4, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.17.0, )"
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
