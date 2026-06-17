@@ -25,7 +25,7 @@ A modern, full-stack booking and real-time notification management system design
 **Dynamic Business Control:** Admins can seamlessly create, pause, or update service offers on the fly. All service images are securely processed and permanently hosted via the **Cloudinary API**, ensuring no data loss during server restarts.
 
 ### 3. 📅 Customer Booking Experience
-![Explore Deals](./images/frontend%20images/ExploreDeals.png)
+![Explore Deals](./images/frontend%20images/BookingPage.png)
 **Seamless User Journey:** Customers can browse active services, view real-time availability slots, and book instantly. Every successful booking triggers the **Notification Engine**, sending an automated confirmation alert straight to the customer's email!
 
 ---
